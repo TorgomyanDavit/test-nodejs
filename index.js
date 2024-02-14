@@ -1,21 +1,23 @@
-// import express from "express"
-// import session from "express-session"
-// import EventEmitter from "node:events"
-// import path from "path"
-// import fs from "fs"
-// import { Worker,isMainThread } from 'worker_threads';
-// import cluster from "cluster";
-// import os from "os"
-// import fetch from 'node-fetch';
-// import { createPool } from "mysql2/promise";
-// const currentDir = path.resolve()
-// import sharp from 'sharp';
-// import axios from "axios";
-// import { load } from 'cheerio';
-// import myEmitter from "./nodeLogic/eventEmiter.js"
-// import greet from "log-greet"
-// import crypto from "crypto"
-// import jwt from 'jsonwebtoken';
+import express from "express"
+import session from "express-session"
+import EventEmitter from "node:events"
+import path from "path"
+import fs from "fs"
+import { Worker,isMainThread } from 'worker_threads';
+import cluster from "cluster";
+import os from "os"
+import fetch from 'node-fetch';
+import { createPool } from "mysql2/promise";
+const currentDir = path.resolve()
+import sharp from 'sharp';
+import axios from "axios";
+import { load } from 'cheerio';
+import myEmitter from "./nodeLogic/eventEmiter.js"
+import greet from "log-greet"
+import crypto from "crypto"
+import jwt from 'jsonwebtoken';
+import cors from "cors";
+
 
 
 // // export const pool = createPool({
@@ -26,17 +28,29 @@
 // //     multipleStatements: true
 // // });
 
-// const app = express()
-// app.use(session({
-//     secret:process.env.SECRET,
-//     // cookie: { expires : new Date(Date.now() + 3600000) },
-//     // cookie:{maxAge:60000},
-//     saveUninitialized:false,
-//     resave:false
-// }))
-// app.use(express.json())
-// app.use(express.urlencoded({extended:true}))
-// app.use(express.static("public"))
+const app = express()
+app.use(session({
+    secret:process.env.SECRET,
+    // cookie: { expires : new Date(Date.now() + 3600000) },
+    // cookie:{maxAge:60000},
+    saveUninitialized:true,
+    resave:false
+}))
+
+
+app.use(cors({
+    origin: [
+      'http://localhost:3000',// test url
+      'http://localhost:3001'// test url
+    ],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    credentials:true,
+    optionsSuccessStatus: 200
+}));
+
+app.use(express.json())
+app.use(express.urlencoded({extended:true}))
+app.use(express.static("public"))
 
 // // Thread
 // const Worker1 = new Worker("./workerOne.js");
@@ -44,202 +58,293 @@
 //     console.log(`worker 1 Work after ${elapsedMilliseconds} second when run Thread and resuls is ${result}`);
 // })
 
-// app.get("/openia",async (req,res) => {
-//     // this is not free
-//     // try {
-//     //     const chatCompletion = await openai.createImage({
-//     //         prompt:"a white cat",
-//     //         n:1,
-//     //         size:"1024x1024"
-//     //     });
+app.get("/openia",async (req,res) => {
+    // this is not free
+    // try {
+    //     const chatCompletion = await openai.createImage({
+    //         prompt:"a white cat",
+    //         n:1,
+    //         size:"1024x1024"
+    //     });
     
-//     //     // console.log(chatCompletion,"chatCompletion")
-//     //     res.send({message:chatCompletion})
-//     // } catch(err) {
-//     //     console.log("err")
-//     // }
-//     // const response = await openai.createCompletion({
-//     //     model: "text-davinci-003",
-//     //     prompt: "You: How do I combine arrays?\nJavaScript chatbot: You can use the concat() method.\nYou: How do you make an alert appear after 10 seconds?\nJavaScript chatbot",
-//     //     temperature: 0,
-//     //     max_tokens: 150,
-//     //     top_p: 1.0,
-//     //     frequency_penalty: 0.5,
-//     //     presence_penalty: 0.0,
-//     //     stop: ["You:"],
-//     // });
-//     // console.log(response,"response")
-//     res.send({message:"this route about Event openAi"})
-// })
+    //     // console.log(chatCompletion,"chatCompletion")
+    //     res.send({message:chatCompletion})
+    // } catch(err) {
+    //     console.log("err")
+    // }
+    // const response = await openai.createCompletion({
+    //     model: "text-davinci-003",
+    //     prompt: "You: How do I combine arrays?\nJavaScript chatbot: You can use the concat() method.\nYou: How do you make an alert appear after 10 seconds?\nJavaScript chatbot",
+    //     temperature: 0,
+    //     max_tokens: 150,
+    //     top_p: 1.0,
+    //     frequency_penalty: 0.5,
+    //     presence_penalty: 0.0,
+    //     stop: ["You:"],
+    // });
+    // console.log(response,"response")
+    res.send({message:"this route about Event openAi"})
+})
 
-// app.get('/LoadHtmlData', (req, res) => {
-//     // axios.get('https://www.pinterest.com/')
-//     // .then(response => {
-//     //   const html = response.data;
-//     //   const $ = load(html);
-//     //   // Use jQuery-like selectors to extract data
-//     //   const title = $('title').text();
-//     //   const pinTitles = $('.itemTitle').map((index, element) => $(element).text()).get();
-//     //   // Print the extracted data
-//     //   console.log('Title:', title);
-//     //   console.log('Pin Titles:', pinTitles);
-//     // })
-//     // .catch(error => {
-//     //   console.error('Error fetching HTML:', error);
-//     // });
-//     res.send({data:"Hello World"});
-// });
+app.get('/LoadHtmlData', (req, res) => {
+    axios.get('https://www.pinterest.com/')
+    .then(response => {
+      const html = response.data;
+      const $ = load(html);
+      // Use jQuery-like selectors to extract data
+      const title = $('title').text();
+      const pinTitles = $('.itemTitle').map((index, element) => $(element).text()).get();
+      // Print the extracted data
+      console.log('Title:', title);
+      console.log('Pin Titles:', pinTitles);
+    })
+    .catch(error => {
+      console.error('Error fetching HTML:', error);
+    });
+    res.send({data:"Hello World"});
+});
 
-// app.get('/getOs', async(req, res) => {
-//     console.log("os.platform()",os.platform())
-//     console.log("os.arch()",os.arch())
-//     console.log("os.cpus()",os.cpus())
-//     console.log("os.freemem()",os.freemem())
-//     console.log("os.totalmem()",os.totalmem())
-//     console.log("os.homedir()",os.homedir())
-//     console.log("os.networkInterfaces()",os.networkInterfaces())
-//     console.log("os.networkInterfaces()",os.userInfo())
-//     console.log("os.homedir()",os.hostname())
+app.get('/getOs', async(req, res) => {
+    console.log("os.platform()",os.platform())
+    console.log("os.arch()",os.arch())
+    console.log("os.cpus()",os.cpus())
+    console.log("os.freemem()",os.freemem())
+    console.log("os.totalmem()",os.totalmem())
+    console.log("os.homedir()",os.homedir())
+    console.log("os.networkInterfaces()",os.networkInterfaces())
+    console.log("os.networkInterfaces()",os.userInfo())
+    console.log("os.homedir()",os.hostname())
 
-//     res.send({data:" this route about Event << os >> package"});
-// });
+    res.send({data:" this route about Event << os >> package"});
+});
 
-// app.get('/eventEmitter', async(req, res) => {
-//     myEmitter.emit('myEvent', 'bomba');
-//     res.send({data:"event emiter"});
-// });
+app.get('/eventEmitter', async(req, res) => {
+    myEmitter.emit('myEvent', 'bomba');
+    res.send({data:"event emiter"});
+});
 
-// app.get('/threed', async(req, res) => {
-//     // myEmitter.emit('myEvent', 'bomba');
-//     Worker1.postMessage({ loop:1000000 });
+app.get('/threed', async(req, res) => {
+    // myEmitter.emit('myEvent', 'bomba');
+    Worker1.postMessage({ loop:1000000 });
     
-//     console.log("this first step")
-//     res.send({data:"this route about Event threed Worker"});
-// });
+    console.log("this first step")
+    res.send({data:"this route about Event threed Worker"});
+});
 
-// app.get('/buffer', async(req, res) => {
-//     const bufferalloc = Buffer.alloc(1);
-//     const bufferfrom = Buffer.from("Vishvas");
-//     console.log(bufferfrom,"buffer") 
-//     console.log(bufferfrom.toJSON(),"buffer")  // This give me charCode whish equal Ascii
-//     console.log("V".charCodeAt(),"buffer")  
+app.get('/buffer', async(req, res) => {
+    const bufferalloc = Buffer.alloc(1);
+    const bufferfrom = Buffer.from("Vishvas");
+    console.log(bufferfrom,"buffer") 
+    console.log(bufferfrom.toJSON(),"buffer")  // This give me charCode whish equal Ascii
+    console.log("V".charCodeAt(),"buffer")  
 
-//     res.send({data:"this route about buffer"});
-// });
+    res.send({data:"this route about buffer"});
+});
 
-// app.get('/resize/:image/:width/:height', (req, res) => {
-//     const { image, width, height } = req.params;
+app.get('/resize/:image/:width/:height', (req, res) => {
+    const { image, width, height } = req.params;
   
-//     // Path to the original image (replace with your actual image path)
-//     const imagePath = path.resolve('images', image);
+    // Path to the original image (replace with your actual image path)
+    const imagePath = path.resolve('images', image);
   
-//     sharp(imagePath)
-//         .resize(Number(width), Number(height), { fit: 'inside' })
-//         .toBuffer()
-//         .then((data) => {
-//             res.set('Content-Type', 'image/jpeg'); // Set the appropriate content type
-//             res.send(data);
-//         })
-//         .catch((err) => {
-//             res.status(500).send('Error resizing image');
-//         });
+    sharp(imagePath)
+        .resize(Number(width), Number(height), { fit: 'inside' })
+        .toBuffer()
+        .then((data) => {
+            res.set('Content-Type', 'image/jpeg'); // Set the appropriate content type
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(500).send('Error resizing image');
+        });
 
-//     res.send({data:"this route about /resize/:image/:width/:height"});
+    res.send({data:"this route about /resize/:image/:width/:height"});
 
-// });
+});
 
-// app.get('/rapid', async (req, res) => {
-//     res.send({data:"response.data"});
-// });
+app.get('/rapid', async (req, res) => {
+    res.send({data:"response.data"});
+});
   
-// app.get('/stream', async (req, res) => {
-//     const readableStream = fs.createReadStream('./file.txt', {
-//         encoding: 'utf-8'
-//     });
+app.get('/stream', async (req, res) => {
+    const readableStream = fs.createReadStream('./file.txt', {
+        encoding: 'utf-8'
+    });
 
-//     const writableStream = fs.createWriteStream('./file2.txt', { // Fix: createWriteStream instead of createReadStream
-//         encoding: 'utf-8'
-//     });
+    const writableStream = fs.createWriteStream('./file2.txt', { // Fix: createWriteStream instead of createReadStream
+        encoding: 'utf-8'
+    });
 
-//     readableStream.on('data', (chunk) => {
-//         console.log(chunk, 'chunk');
-//         writableStream.write(chunk);
-//     });
+    readableStream.on('data', (chunk) => {
+        console.log(chunk, 'chunk');
+        writableStream.write(chunk);
+    });
 
-//     readableStream.on('end', () => {
-//         writableStream.end();
-//         console.log('Stream completed');
-//     });
+    readableStream.on('end', () => {
+        writableStream.end();
+        console.log('Stream completed');
+    });
 
-//     res.send({ data: 'this route about stream' });
-// });
+    res.send({ data: 'this route about stream' });
+});
 
-// app.get('/crypto', async (req, res) => {
-//     // const start = Date.now()
-//     // crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
-//     //     console.log('hash', Date.now() - start);
-//     // })
-//     // crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
-//     //     console.log('hash', Date.now() - start);
-//     // })
-//     // crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
-//     //     console.log('hash', Date.now() - start);
-//     // })
-//     // crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
-//     //     console.log('hash', Date.now() - start);
-//     // })
-//     // crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
-//     //     console.log('hash', Date.now() - start);
-//     // })
+app.get('/crypto', async (req, res) => {
+    const start = Date.now()
+    crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
+        console.log('hash', Date.now() - start);
+    })
+    crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
+        console.log('hash', Date.now() - start);
+    })
+    crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
+        console.log('hash', Date.now() - start);
+    })
+    crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
+        console.log('hash', Date.now() - start);
+    })
+    crypto.pbkdf2("hello","salt",100000, 512,'sha512',() => {
+        console.log('hash', Date.now() - start);
+    })
 
-//     // const cpuCount = os.cpus().length;
-//     // console.log(process.env.UV_THREADPOOL_SIZE, Date.now() - start);
+    const cpuCount = os.cpus().length;
+    console.log(process.env.UV_THREADPOOL_SIZE, Date.now() - start);
 
-//     // console.log(crypto.getHashes())
-//     // crypto.randomBytes(1,(err,buf) => {
-//     //     console.log(buf)
-//     // })
+    console.log(crypto.getHashes())
+    crypto.randomBytes(1,(err,buf) => {
+        console.log(buf)
+    })
 
-//     res.send({ data: 'this route about crypto' });
-// });
+    res.send({ data: 'this route about crypto' });
+});
 
-// app.get('/jsonwebtoken', async (req, res) => {
-//     // Data to be included in the token
-//     const payload = {
-//         user_id: 123,
-//         username: 'example_user',
-//     };
+app.get('/jsonwebtoken', async (req, res) => {
+    // Data to be included in the token
+    const payload = {
+        user_id: 123,
+        username: 'example_user',
+    };
 
-//     const options = {
-//         expiresIn: '1h', // Token expires in 1 hour
-//     };
+    const options = {
+        expiresIn: '1h', // Token expires in 1 hour
+    };
       
-//     // Sign the JWT
-//     const secretKey = "12sdadadd5dhgf5646s4fsd4g64g6d46g460fdagfdgh5d5d6dfsd444agdfggd"
-//     const token = jwt.sign(payload, secretKey, options);
+    // Sign the JWT
+    const secretKey = "12sdadadd5dhgf5646s4fsd4g64g6d46g460fdagfdgh5d5d6dfsd444agdfggd"
+    const token = jwt.sign(payload, secretKey, options);
     
-//     // Verify and decode the token
-//     const verif = jwt.verify(token, secretKey);
+    const decoded = jwt.decode(token);
+    // Verify and decode the token
+    const verif = jwt.verify(token, secretKey);
 
-//     res.send({ data:"this route about jsonwebtoken" });
+    res.send({ data:"this route about jsonwebtoken" });
+});
+
+app.get('/eventLoop', async(req, res) => {
+    /** test 1 first work nextTick */ 
+    process.nextTick(() => console.log('nextTick')); // արաջինը տպումա սա console.log(`nextTick`)) route _ի մեջ
+    Promise.resolve().then(() => console.log(`Promise`)); 
+    setImmediate(() => console.log('setImmediate'));
+
+
+    // Log when the event loop is about to start.
+    process.on('beforeExit', () => {
+        console.log('Before exit event loop');rs
+    });
+
+    // Log when the event loop has finished processing all tasks and is about to exit.
+    process.on('exit', () => {
+        console.log('Exit event loop');
+    });
+
+    // Log when the event loop is idle (no more tasks to process).
+    process.on('idle', () => {
+        console.log('Idle event loop');
+    });
+
+    // Log when there is a rejected promise.
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error('Unhandled Rejection:', reason);
+    });
+
+    // Log when an uncaught exception occurs.
+    process.on('uncaughtException', (error) => {
+        console.error('Uncaught Exception:', error);
+    });
+
+    // Log when a promise is rejected and no 'unhandledRejection' event handler is registered.
+    process.on('rejectionHandled', (promise) => {
+        console.log('Rejection handled:', promise);
+    });
+
+    // Log when a new task is about to be executed in the event loop.
+    process.on('beforeEach', () => {
+        console.log('Before each event loop iteration');
+    });
+
+    // Log when a new task has just been executed in the event loop.
+    process.on('afterEach', () => {
+        console.log('After each event loop iteration');
+    });
+
+    // Log when an uncaught exception is about to cause the process to exit.
+    process.on('warning', (warning) => {
+        console.warn('Warning:', warning);
+    });
+
+    // Trigger some asynchronous tasks to see the event loop in action.
+    setTimeout(() => {
+        console.log('setTimeout task executed');
+    }, 0);
+
+    setImmediate(() => {
+        console.log('setImmediate task executed');
+    });
+
+    Promise.resolve().then(() => {
+        console.log('Promise resolution task executed');
+    });
+
+    process.nextTick(() => {
+        console.log('nextTick 2')
+        process.nextTick(() => console.log('nextTick 3')); 
+        Promise.resolve().then(() => console.log(`Promise 2`)); 
+    });
+
+    process.nextTick(() => console.log('nextTick 1')); 
+    Promise.resolve().then(() => console.log(`Promise 1`)); 
+
+    res.send({data:"this route about Event loop"});
+});
+
+// (async function() {
+//     const resp = await fetch("http://localhost:5000/jsonwebtoken").then((res) => res.json())
+//     console.log(resp,"respresp")
+// })()
+
+app.get('/getToken', async (req, res) => {
+    res.cookie('_csrf', "newCsrfToken", {
+      secure: true, // It means that the cookie will only be sent over HTTPS
+      httpOnly: false, // inaccessible to JavaScript on the client side.
+      sameSite: 'strict', // send cookie when open  browser's in address bar.
+    });
+
+
+    res.send({name:'Hello, TypeScript Express App!'});
+});
+
+
+/** Event Loop bug */
+// process.nextTick(() => {
+//     process.nextTick(() => console.log('nextTick 1')); // առաջինը տպումա console.log(`nextTick`);
+//     Promise.resolve().then(() => console.log(`Promise 2`)); 
 // });
+// process.nextTick(() => console.log('nextTick 1')); 
+// Promise.resolve().then(() => console.log(`Promise 1`)); // առաջինը տպումա console.log(`Promise`);
 
-// app.get('/eventLoop', async(req, res) => {
-//     /** test 1 first work nextTick */ 
-//     process.nextTick(() => console.log('nextTick')); // արաջինը տպումա սա console.log(`nextTick`)) route _ի մեջ
-//     Promise.resolve().then(() => console.log(`Promise`)); 
-//     setImmediate(() => console.log('setImmediate'));
 
-//     res.send({data:"this route about Event loop"});
-// });
-
-process.nextTick(() => console.log('nextTick')); 
-Promise.resolve().then(() => console.log(`Promise`)); // առաջինը տպումա console.log(`Promise`);
-setImmediate(() => console.log('setImmediate'));
-
-// app.listen(process.env.PORT, () => {
-//     console.log(`Server is running on http://localhost:${process.env.PORT}`);
-// });
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT}`);
+});
 
 
 
@@ -591,3 +696,73 @@ setImmediate(() => console.log('setImmediate'));
 // export function greet(data) {
 //     console.log(data + " this is bomb")
 // }
+
+
+// // Log when the event loop is about to start.
+// process.on('beforeExit', () => {
+//     console.log('Before exit event loop');
+// });
+
+// // Log when the event loop has finished processing all tasks and is about to exit.
+// process.on('exit', () => {
+//     console.log('Exit event loop');
+// });
+
+// // Log when the event loop is idle (no more tasks to process).
+// process.on('idle', () => {
+//     console.log('Idle event loop');
+// });
+
+// // Log when there is a rejected promise.
+// process.on('unhandledRejection', (reason, promise) => {
+//     console.error('Unhandled Rejection:', reason);
+// });
+
+// // Log when an uncaught exception occurs.
+// process.on('uncaughtException', (error) => {
+//     console.error('Uncaught Exception:', error);
+// });
+
+// // Log when a promise is rejected and no 'unhandledRejection' event handler is registered.
+// process.on('rejectionHandled', (promise) => {
+//     console.log('Rejection handled:', promise);
+// });
+
+// // Log when a new task is about to be executed in the event loop.
+// process.on('beforeEach', () => {
+//     console.log('Before each event loop iteration');
+// });
+
+// // Log when a new task has just been executed in the event loop.
+// process.on('afterEach', () => {
+//     console.log('After each event loop iteration');
+// });
+
+// // Log when an uncaught exception is about to cause the process to exit.
+// process.on('warning', (warning) => {
+//     console.warn('Warning:', warning);
+// });
+
+// // Trigger some asynchronous tasks to see the event loop in action.
+// setTimeout(() => {
+//     console.log('setTimeout task executed');
+// }, 0);
+
+// setImmediate(() => {
+//     console.log('setImmediate task executed');
+// });
+
+// Promise.resolve().then(() => {
+//     console.log('Promise resolution task executed');
+// });
+
+
+
+// process.nextTick(() => {
+//     console.log('nextTick 2')
+//     process.nextTick(() => console.log('nextTick 3')); 
+//     Promise.resolve().then(() => console.log(`Promise 2`)); 
+// });
+
+// process.nextTick(() => console.log('nextTick 1')); 
+// Promise.resolve().then(() => console.log(`Promise 1`)); 
