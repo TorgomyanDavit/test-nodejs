@@ -37,11 +37,11 @@ app.use(session({
     resave:false
 }))
 
-
 app.use(cors({
     origin: [
       'http://localhost:3000',// test url
-      'http://localhost:3001'// test url
+      'http://localhost:3001',// test url
+      "https://www.holtrinity.com"
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials:true,
@@ -52,10 +52,20 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
 
-// // Thread
-// const Worker1 = new Worker("./workerOne.js");
-// Worker1.on("message",({elapsedMilliseconds,result}) => {
-//     console.log(`worker 1 Work after ${elapsedMilliseconds} second when run Thread and resuls is ${result}`);
+// Thread /** Workers */
+const Worker1 = new Worker("./workerOne.js");
+Worker1.on("message",({elapsedMilliseconds,result}) => {
+    console.log(`worker 1 Work after ${elapsedMilliseconds} second when run Thread and resuls is ${result}`);
+})
+
+// const Worker2 = new Worker("./workerTwo.js");
+// Worker2.on("message",(msg) => {
+//     console.log(`Message from Thread ${msg}`);
+// })
+
+// const openIaModel = new Worker("./openIaModel.js");
+// openIaModel.on("message",(msg) => {
+//     console.log(`Message from openIaModel Thread ${msg}`);
 // })
 
 app.get("/openia",async (req,res) => {
@@ -125,7 +135,7 @@ app.get('/eventEmitter', async(req, res) => {
 
 app.get('/threed', async(req, res) => {
     // myEmitter.emit('myEvent', 'bomba');
-    Worker1.postMessage({ loop:1000000 });
+    Worker1.postMessage({ loop:100 });
     
     console.log("this first step")
     res.send({data:"this route about Event threed Worker"});
@@ -316,22 +326,19 @@ app.get('/eventLoop', async(req, res) => {
     res.send({data:"this route about Event loop"});
 });
 
+app.get('/getToken', async (req, res) => {
+    res.cookie('_csrf', "newCsrfToken", {
+      secure: false, // It means that the cookie will only be sent over HTTPS
+      httpOnly: false, // inaccessible to JavaScript on the client side.
+      sameSite: 'strict', // send cookie when open  browser's in address bar.
+    });
+    res.send({name:'Hello, TypeScript Express App!'});
+});
+
 // (async function() {
 //     const resp = await fetch("http://localhost:5000/jsonwebtoken").then((res) => res.json())
 //     console.log(resp,"respresp")
 // })()
-
-app.get('/getToken', async (req, res) => {
-    res.cookie('_csrf', "newCsrfToken", {
-      secure: true, // It means that the cookie will only be sent over HTTPS
-      httpOnly: false, // inaccessible to JavaScript on the client side.
-      sameSite: 'strict', // send cookie when open  browser's in address bar.
-    });
-
-
-    res.send({name:'Hello, TypeScript Express App!'});
-});
-
 
 /** Event Loop bug */
 // process.nextTick(() => {
@@ -342,29 +349,18 @@ app.get('/getToken', async (req, res) => {
 // Promise.resolve().then(() => console.log(`Promise 1`)); // առաջինը տպումա console.log(`Promise`);
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on http://localhost:${process.env.PORT}`);
-});
 
 
-
-/** Workers */
-// const Worker2 = new Worker("./workerTwo.js");
-// Worker2.on("message",(msg) => {
-//     console.log(`Message from Thread ${msg}`);
-// })
-
-// const openIaModel = new Worker("./openIaModel.js");
-// openIaModel.on("message",(msg) => {
-//     console.log(`Message from openIaModel Thread ${msg}`);
-// })
+// app.listen(process.env.PORT, () => {
+//     console.log(`Server is running on http://localhost:${process.env.PORT}`);
+// });
 
 // const readFilePath = path.join(currentDir,".env")
 // fs.readFile(readFilePath,"utf-8",((error,text) => {
-//     console.log(`2`);
+//     console.log(`readFilePath`);
 // }))
 
-// const baz = ;
+// const baz = () => console.log('baz');
 // const foo = () => console.log('foo');
 // const zoo = () => console.log('zoo');
 // const start = () => {
@@ -411,7 +407,6 @@ app.listen(process.env.PORT, () => {
 // Promise.resolve().then(() => console.log(`Promise.resolve().then() 3`)); // 2
 
 // experiment 3
-
 // //  I/O Queue
 // const readFilePath = path.join(currentDir,".env")
 // fs.readFile(readFilePath,"utf-8",(error,text) => {
@@ -766,3 +761,83 @@ app.listen(process.env.PORT, () => {
 
 // process.nextTick(() => console.log('nextTick 1')); 
 // Promise.resolve().then(() => console.log(`Promise 1`)); 
+
+
+
+// console.log('Script start');
+
+// // Case 1: setTimeout (Timer Phase)
+// setTimeout(() => {
+//   console.log('Timer callback 1');
+// }, 0);
+
+// setImmediate(() => {
+//     console.log('setImmediate task executed');
+// });
+
+// // Case 2: Immediate I/O (Poll Phase)
+// const readFilePath = path.join(currentDir,".env")
+// fs.readFile(readFilePath, 'utf8', (err, data) => {
+//   if (err) {
+//     console.error('Error reading file:', err);
+//     return;
+//   }
+//   console.log('File content:');
+// });
+
+// // Case 3: Promise (Microtask Queue)
+// Promise.resolve().then(() => {
+//   console.log('Promise resolved (Microtask)');
+// });
+
+// // Case 4: Next Tick Queue
+// process.nextTick(() => {
+//   console.log('Next tick callback');
+// });
+
+// console.log('Script end');
+
+
+
+/** Event loop  */
+// console.log('Script start');
+
+// process.nextTick(() => {
+//     console.log('Next tick callback');
+//     setTimeout(() => {
+//         console.log('Timer callback 1');
+//     }, 0);
+
+//     setImmediate(() => {
+//         console.log('setImmediate task executed');
+//     });
+// });
+
+// const readFilePath = path.join(currentDir,".env")
+// fs.readFile(readFilePath,(error,text) => {
+//     console.log("readFile")
+
+//     setImmediate(() => {
+//         console.log('setImmediate task executed');
+//     });
+
+//     setTimeout(() => {
+//         console.log('Timer callback 1');
+//     }, 0);
+// })
+
+// console.log('Script end');
+
+//  NextTick
+// process.nextTick(() => console.log('process Next tick 1')); 
+
+// // Promise
+// Promise.resolve().then(() => console.log(`Promise.resolve().then() 1`)); 
+
+// process.nextTick(() => {
+//     process.nextTick(() => console.log('nextTick 7'));
+//     Promise.resolve().then(() => console.log(`Promise 2`)); 
+// });
+
+
+

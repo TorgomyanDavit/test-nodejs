@@ -3,16 +3,10 @@ import myEmitter from "./nodeLogic/eventEmiter.js"
 // console.log(process.pid,"finish")
 
 
-
-
-
-
-
-
-parentPort.on('message', async (message) => {
+parentPort.on('message', async (time) => {
     let result = 0
     const startTimestamp = performance.now();
-    for (let index = 0; index < 100000; index++) {
+    for (let index = 0; index < time.loop; index++) {
         result += index
     }
     const elapsedMilliseconds = performance.now() - startTimestamp;

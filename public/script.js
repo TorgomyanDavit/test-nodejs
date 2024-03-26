@@ -1,5 +1,3 @@
-
-
 // const submit = document.getElementById("button")
 // submit.addEventListener("click",async () => {
 //     const data = await axios.get('/openia')
@@ -20,6 +18,16 @@
 //     const data = await axios.get('/stream')
 //     console.log(data);
 // })();
+
+// (async function() {
+//     const data = await axios.get('/getOs')
+//     console.log(data);
+// })();
+
+(async function() {
+    const data = await axios.get('/stream')
+    console.log(data);
+})();
 
 
 
