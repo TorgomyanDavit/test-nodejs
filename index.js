@@ -251,78 +251,97 @@ app.get('/jsonwebtoken', async (req, res) => {
 
 app.get('/eventLoop', async(req, res) => {
     /** test 1 first work nextTick */ 
-    process.nextTick(() => console.log('nextTick')); // արաջինը տպումա սա console.log(`nextTick`)) route _ի մեջ
-    Promise.resolve().then(() => console.log(`Promise`)); 
-    setImmediate(() => console.log('setImmediate'));
+    console.log('Script start');
 
 
-    // Log when the event loop is about to start.
-    process.on('beforeExit', () => {
-        console.log('Before exit event loop');rs
-    });
+    const readFilePath = path.join(currentDir,".env")
+    fs.readFile(readFilePath,(error,text) => {
+        setImmediate(() => {
+            console.log('setImmediate task executed');
+        });
 
-    // Log when the event loop has finished processing all tasks and is about to exit.
-    process.on('exit', () => {
-        console.log('Exit event loop');
-    });
+        setTimeout(() => {
+            console.log('Timer callback 1');
+        }, 0);
 
-    // Log when the event loop is idle (no more tasks to process).
-    process.on('idle', () => {
-        console.log('Idle event loop');
-    });
+        Promise.resolve().then(() => console.log(`Promise`)); 
+        process.nextTick(() => console.log('nextTick')); 
+    })
 
-    // Log when there is a rejected promise.
-    process.on('unhandledRejection', (reason, promise) => {
-        console.error('Unhandled Rejection:', reason);
-    });
+    // process.nextTick(() => console.log('nextTick')); // արաջինը տպումա սա console.log(`nextTick`)) route _ի մեջ
+    // Promise.resolve().then(() => console.log(`Promise`)); 
+    // setImmediate(() => console.log('setImmediate'));
 
-    // Log when an uncaught exception occurs.
-    process.on('uncaughtException', (error) => {
-        console.error('Uncaught Exception:', error);
-    });
 
-    // Log when a promise is rejected and no 'unhandledRejection' event handler is registered.
-    process.on('rejectionHandled', (promise) => {
-        console.log('Rejection handled:', promise);
-    });
 
-    // Log when a new task is about to be executed in the event loop.
-    process.on('beforeEach', () => {
-        console.log('Before each event loop iteration');
-    });
+    // // Log when the event loop is about to start.
+    // process.on('beforeExit', () => {
+    //     console.log('Before exit event loop');rs
+    // });
 
-    // Log when a new task has just been executed in the event loop.
-    process.on('afterEach', () => {
-        console.log('After each event loop iteration');
-    });
+    // // Log when the event loop has finished processing all tasks and is about to exit.
+    // process.on('exit', () => {
+    //     console.log('Exit event loop');
+    // });
 
-    // Log when an uncaught exception is about to cause the process to exit.
-    process.on('warning', (warning) => {
-        console.warn('Warning:', warning);
-    });
+    // // Log when the event loop is idle (no more tasks to process).
+    // process.on('idle', () => {
+    //     console.log('Idle event loop');
+    // });
+
+    // // Log when there is a rejected promise.
+    // process.on('unhandledRejection', (reason, promise) => {
+    //     console.error('Unhandled Rejection:', reason);
+    // });
+
+    // // Log when an uncaught exception occurs.
+    // process.on('uncaughtException', (error) => {
+    //     console.error('Uncaught Exception:', error);
+    // });
+
+    // // Log when a promise is rejected and no 'unhandledRejection' event handler is registered.
+    // process.on('rejectionHandled', (promise) => {
+    //     console.log('Rejection handled:', promise);
+    // });
+
+    // // Log when a new task is about to be executed in the event loop.
+    // process.on('beforeEach', () => {
+    //     console.log('Before each event loop iteration');
+    // });
+
+    // // Log when a new task has just been executed in the event loop.
+    // process.on('afterEach', () => {
+    //     console.log('After each event loop iteration');
+    // });
+
+    // // Log when an uncaught exception is about to cause the process to exit.
+    // process.on('warning', (warning) => {
+    //     console.warn('Warning:', warning);
+    // });
 
     // Trigger some asynchronous tasks to see the event loop in action.
-    setTimeout(() => {
-        console.log('setTimeout task executed');
-    }, 0);
+    // setTimeout(() => {
+    //     console.log('setTimeout task executed');
+    // }, 0);
 
-    setImmediate(() => {
-        console.log('setImmediate task executed');
-    });
+    // setImmediate(() => {
+    //     console.log('setImmediate task executed');
+    // });
 
-    Promise.resolve().then(() => {
-        console.log('Promise resolution task executed');
-    });
+    // Promise.resolve().then(() => {
+    //     console.log('Promise resolution task executed');
+    // });
 
-    process.nextTick(() => {
-        console.log('nextTick 2')
-        process.nextTick(() => console.log('nextTick 3')); 
-        Promise.resolve().then(() => console.log(`Promise 2`)); 
-    });
+    // process.nextTick(() => {
+    //     console.log('nextTick 2')
+    //     process.nextTick(() => console.log('nextTick 3')); 
+    //     Promise.resolve().then(() => console.log(`Promise 2`)); 
+    // });
 
-    process.nextTick(() => console.log('nextTick 1')); 
-    Promise.resolve().then(() => console.log(`Promise 1`)); 
+    // process.nextTick(() => console.log('nextTick 1')); 
+    // Promise.resolve().then(() => console.log(`Promise 1`)); 
 
+    console.log('Script end');
     res.send({data:"this route about Event loop"});
 });
 
@@ -351,9 +370,18 @@ app.get('/getToken', async (req, res) => {
 
 
 
-// app.listen(process.env.PORT, () => {
-//     console.log(`Server is running on http://localhost:${process.env.PORT}`);
-// });
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on http://localhost:${process.env.PORT}`);
+});
+
+const readFilePath = path.join(currentDir,".env")
+fs.readFile(readFilePath,(error,text) => {
+    console.log('fileRead task executed');
+})
+process.nextTick(() => console.log('nextTick 1'));
+setImmediate(() => console.log('setImmediate 1'));
+setTimeout(() => console.log('setTimeout 1'), 0);
+
 
 // const readFilePath = path.join(currentDir,".env")
 // fs.readFile(readFilePath,"utf-8",((error,text) => {

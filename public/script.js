@@ -24,8 +24,13 @@
 //     console.log(data);
 // })();
 
+// (async function() {
+//     const data = await axios.get('/stream')
+//     console.log(data);
+// })();
+
 (async function() {
-    const data = await axios.get('/stream')
+    const data = await axios.get('/eventLoop')
     console.log(data);
 })();
 

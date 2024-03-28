@@ -1,9 +1,9 @@
-import path from "path"
-import fs from "fs"
-const currentDir = path.resolve()
+// import path from "path"
+// import fs from "fs"
+// const currentDir = path.resolve()
 
 
-console.log('Script start');
+// console.log('Script start');
 
 
 // process.nextTick(() => {
@@ -28,18 +28,18 @@ console.log('Script start');
 //     setTimeout(() => {
 //         console.log('Timer callback 1');
 //     }, 0);
+
+//     process.nextTick(() => console.log("process.nextTick executed"))
 // })
 
-for(let i = 0;i < 10;i++) {
-    setImmediate(() => {
-        console.log('setImmediate task executed');
-    });
-    
-    setTimeout(() => {
-        console.log('Timer callback 1');
-    }, 0);
-}
+// setImmediate(() => {
+//     console.log('setImmediate task executed');
+// });
+
+// setTimeout(() => {
+//     console.log('Timer callback 1');
+// }, 0);
 
 
 
-console.log('Script end');
+// console.log('Script end');
