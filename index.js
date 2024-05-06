@@ -39,9 +39,9 @@ app.use(session({
 
 app.use(cors({
     origin: [
-      'http://localhost:3000',// test url
-      'http://localhost:3001',// test url
-      "https://www.holtrinity.com"
+    //   'http://localhost:3000',// test url
+    //   'http://localhost:3001',// test url
+    //   "https://www.holtrinity.com"
     ],
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials:true,
@@ -67,6 +67,29 @@ Worker1.on("message",({elapsedMilliseconds,result}) => {
 // openIaModel.on("message",(msg) => {
 //     console.log(`Message from openIaModel Thread ${msg}`);
 // })
+
+
+app.get('/GarbageCollection', (req, res) => {
+    let allocatedMemory = [];
+
+    function allocateMemory() {
+      for (let i = 0; i < 1000000; i++) {
+        allocatedMemory.push(new Array(1000).fill(0));
+      }
+    }
+    
+    function logMemoryUsage() {
+      const memoryUsageMB = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2);
+      console.log(`Memory usage: ${memoryUsageMB} MB`);
+    }
+    
+    console.log(allocatedMemory,"allocatedMemory")
+    setInterval(() => {
+      allocateMemory();
+      logMemoryUsage();
+    }, 1000);
+    res.send({data:"Hello World"});
+});
 
 app.get("/openia",async (req,res) => {
     // this is not free

@@ -2,9 +2,9 @@
     "name": "node-app",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
+    "main": "eventLoop.js",
     "scripts": {
-        "dev": "nodemon --require dotenv/config index.js"
+        "dev": "nodemon --require dotenv/config eventLoop.js"
     },
     "author": "",
     "license": "ISC",
@@ -29,5 +29,6 @@
     "devDependencies": {
         "dotenv": "^16.0.3",
         "nodemon": "^2.0.22"
-    }
+    },
+    "proxy":"http://localhost:5000"
 }
