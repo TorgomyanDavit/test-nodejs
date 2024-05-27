@@ -13,3 +13,8 @@
 body {
     padding-bottom: 50px !important;
 }
+
+input {
+    width: 500px;
+    height: 30px;
+}

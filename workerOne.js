@@ -8,12 +8,11 @@ parentPort.on('message', async (time) => {
     const startTimestamp = performance.now();
     for (let index = 0; index < time.loop; index++) {
         result += index
+        console.log(result, 'result');
     }
+
     const elapsedMilliseconds = performance.now() - startTimestamp;
-
-    
     console.log('Elapsed time:', elapsedMilliseconds, 'ms');
-
     parentPort.postMessage({elapsedMilliseconds,result});
 });
 

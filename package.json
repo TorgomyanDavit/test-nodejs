@@ -2,9 +2,9 @@
     "name": "node-app",
     "version": "1.0.0",
     "description": "",
-    "main": "eventLoop.js",
+    "main": "index.js",
     "scripts": {
-        "dev": "nodemon --require dotenv/config eventLoop.js"
+        "dev": "nodemon --require dotenv/config index.js"
     },
     "author": "",
     "license": "ISC",
@@ -14,9 +14,13 @@
         "cheerio": "^1.0.0-rc.12",
         "cluster": "^0.7.7",
         "cors": "^2.8.5",
+        "esprima": "^4.0.1",
         "express": "^4.18.2",
         "express-router": "^0.0.1",
         "express-session": "^1.17.3",
+        "express-validator": "^7.0.1",
+        "helmet": "^7.1.0",
+        "hpp": "^0.2.3",
         "jsonwebtoken": "^9.0.2",
         "log-greet": "^1.0.0",
         "mysql2": "^3.5.2",
@@ -24,11 +28,12 @@
         "openai": "^3.3.0",
         "puppeteer": "^21.6.0",
         "router": "^1.3.8",
-        "sharp": "^0.32.6"
+        "sharp": "^0.32.6",
+        "transliteration": "^2.1.6"
     },
     "devDependencies": {
         "dotenv": "^16.0.3",
         "nodemon": "^2.0.22"
     },
-    "proxy":"http://localhost:5000"
+    "proxy": "http://localhost:5000"
 }
