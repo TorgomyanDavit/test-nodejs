@@ -19,6 +19,7 @@ import crypto from "crypto"
 import jwt from 'jsonwebtoken';
 import cors from "cors";
 import esprima from "esprima"
+import TelegramBot from 'node-telegram-bot-api';
 // import pkg from 'express-validator';
 // const { sanitizeQuery, sanitizeBody } = pkg;
 import helmet from "helmet";
@@ -28,12 +29,6 @@ import { ConstructQuote } from "./thirdPartFunction/index.js";
 // const { transliterate, createCustomTransliterator } = transliteration;
 
 
-const englishToArmenianMapping = {
-    'a': 'ա', 'b': 'բ', 'g': 'գ', 'd': 'դ', 'e': 'ե', 'z': 'զ', 'e': 'է', 'ë': 'ը', 't': 'թ', 'zh': 'ժ',
-    'i': 'ի', 'l': 'լ', 'x': 'խ', 'c': 'ծ', 'k': 'կ', 'h': 'հ', 'dz': 'ձ', 'gh': 'ղ', 'tch': 'ճ', 'm': 'մ',
-    'y': 'յ', 'n': 'ն', 'sh': 'շ', 'o': 'ո', 'ch': 'չ', 'p': 'պ', 'j': 'ջ', 'r': 'ռ', 's': 'ս', 'v': 'վ',
-    't': 'տ', 'r': 'ր', 'c': 'ց', 'u': 'ու', 'p': 'փ', 'q': 'ք', 'ev': 'և', 'o': 'օ', 'f': 'ֆ'
-};
 
 const armenianToEnglishMapping = {
     'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'ë', 'թ': 't', 'ժ': 'zh',
@@ -124,6 +119,7 @@ try {
 }
 
 
+
 // // export const pool = createPool({
 // //     host: process.env.db_host, // Replace with your host name
 // //     user: process.env.db_user, // Replace with your root name
@@ -164,6 +160,36 @@ app.use(express.static("public"))
 
 app.set('view engine', 'ejs');
 app.set('views', './src/views'); 
+
+// Telegram bot
+
+
+app.get('/TelegramBot', (req, res) => {
+    const bot = new TelegramBot(process.env.TELEGRAMTOKEN, { polling: true });
+
+
+    // Listen for any kind of message. There are different kinds of messages.
+    bot.on('message', (msg) => {
+        const chatId = msg.chat.id;
+        const text = msg.text;
+    
+        // Send a reply message
+        bot.sendMessage(chatId, `You said: ${text}`);
+    });
+  
+    // Listen for /start command
+    bot.onText(/\/start/, (msg) => {
+        const chatId = msg.chat.id;
+        bot.sendMessage(chatId, 'Welcome to my bot! How can I help you?');
+    });
+
+    
+    res.send({data:"Hello World"});
+});
+
+
+
+
 
 
 // Thread /** Workers */
@@ -559,6 +585,121 @@ app.get('/parserAbstreactSyntaxTreeV8', async (req, res) => {
     res.send({name:'parserAbstreactSyntaxTreeV8'});
 });
 
+
+app.get('/pollution', (req, res) => {
+    const params = req.params;
+    const body = req.body;
+    const query = req.query;
+
+    console.log(params,"params")
+    console.log(body,"body")
+    console.log(query,"query")
+
+
+    res.send({name:'xss'});
+});
+
+app.get('/langiageChangetoRuEnAm', (req, res) => {
+    const englishToArmenianMapping = {
+        'a': 'ա', 'b': 'բ', 'g': 'գ', 'd': 'դ', 'e': 'ե', 'z': 'զ', 'e': 'է', 'ë': 'ը', 't': 'թ', 'zh': 'ժ',
+        'i': 'ի', 'l': 'լ', 'x': 'խ', 'c': 'ծ', 'k': 'կ', 'h': 'հ', 'dz': 'ձ', 'gh': 'ղ', 'tch': 'ճ', 'm': 'մ',
+        'y': 'յ', 'n': 'ն', 'sh': 'շ', 'o': 'ո', 'ch': 'չ', 'p': 'պ', 'j': 'ջ', 'r': 'ռ', 's': 'ս', 'v': 'վ',
+        't': 'տ', 'r': 'ր', 'c': 'ց', 'u': 'ու', 'p': 'փ', 'q': 'ք', 'ev': 'և', 'o': 'օ', 'f': 'ֆ'
+    };
+    
+    const armenianToEnglishMapping = {
+        'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'ë', 'թ': 't', 'ժ': 'zh',
+        'ի': 'i', 'լ': 'l', 'խ': 'x', 'ծ': 'c', 'կ': 'k', 'հ': 'h', 'ձ': 'dz', 'ղ': 'gh', 'ճ': 'tch', 'մ': 'm',
+        'յ': 'y', 'ն': 'n', 'շ': 'sh', 'ո': 'o', 'չ': 'ch', 'պ': 'p', 'ջ': 'j', 'ռ': 'r', 'ս': 's', 'վ': 'v',
+        'տ': 't', 'ր': 'r', 'ց': 'c', 'ու': 'u', 'փ': 'p', 'ք': 'q', 'և': 'ev', 'օ': 'o', 'ֆ': 'f'
+    };
+    
+    const englishToRussianMapping = {
+        'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'e': 'е', 'yo': 'ё', 'zh': 'ж', 'z': 'з', 'i': 'и',
+        'y': 'й', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о', 'p': 'п', 'r': 'р', 's': 'с', 't': 'т',
+        'u': 'у', 'f': 'ф', 'h': 'х', 'ts': 'ц', 'ch': 'ч', 'sh': 'ш', 'sch': 'щ', '': 'ъ', 'y': 'ы', '': 'ь',
+        'e': 'э', 'yu': 'ю', 'ya': 'я'
+    };
+    
+    const russianToEnglishMapping = {
+        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i',
+        'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
+        'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '',
+        'э': 'e', 'ю': 'yu', 'я': 'ya'
+    };
+    
+    const russianToArmenianMapping = {
+        'а': 'ա', 'б': 'բ', 'в': 'վ', 'г': 'գ', 'д': 'դ', 'е': 'ե', 'ё': 'յո', 'ж': 'ժ', 'з': 'զ', 'и': 'ի',
+        'й': 'յ', 'к': 'կ', 'л': 'լ', 'м': 'մ', 'н': 'ն', 'о': 'ո', 'п': 'պ', 'р': 'ռ', 'с': 'ս', 'т': 'տ',
+        'у': 'ու', 'ф': 'ֆ', 'х': 'խ', 'ц': 'ծ', 'ч': 'չ', 'ш': 'շ', 'щ': 'շչ', 'ъ': '', 'ы': 'ը', 'ь': '',
+        'э': 'է', 'ю': 'յու', 'я': 'յա'
+    };
+    
+    const armenianToRussianMapping = {
+        'ա': 'а', 'բ': 'б', 'գ': 'г', 'դ': 'д', 'ե': 'е', 'զ': 'з', 'է': 'э', 'ը': 'ы', 'թ': 'т', 'ժ': 'ж',
+        'ի': 'и', 'լ': 'л', 'խ': 'х', 'ծ': 'ц', 'կ': 'к', 'հ': 'х', 'ձ': 'дз', 'ղ': 'г', 'ճ': 'ч', 'մ': 'м',
+        'յ': 'й', 'ն': 'н', 'շ': 'ш', 'ո': 'о', 'չ': 'ч', 'պ': 'п', 'ջ': 'дж', 'ռ': 'р', 'ս': 'с', 'վ': 'в',
+        'տ': 'т', 'ր': 'р', 'ց': 'ц', 'ու': 'у', 'փ': 'п', 'ք': 'к', 'և': 'ев', 'օ': 'о', 'ֆ': 'ф'
+    };
+
+    const transliterateCustom = (text, mapping) => {
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+            const currentChar = text[i];
+            const nextChar = text[i + 1]; // Get the next character
+    
+            if (nextChar !== undefined) { // Check if there's a next character
+                const pair = currentChar + nextChar; // Form a pair of characters
+                if (mapping[pair]) { // Check if the pair exists in the mapping
+                    result += mapping[pair]; // Transliterate the pair
+                    i++; // Move to the next character
+                    continue; // Continue to the next iteration of the loop
+                }
+            }
+    
+            // If the pair doesn't exist or there's no next character, transliterate the current character individually
+            const mappedChar = mapping[currentChar] || currentChar; 
+            result += mappedChar;
+        }
+        return result;
+    };
+    
+    const transliterateText = (text) => {
+        let inputLang;
+        if (armenianToEnglishMapping[text[0]]) {
+            inputLang = 'am';
+        } else if (russianToEnglishMapping[text[0]]) {
+            inputLang = 'ru';
+        } else {
+            inputLang = 'en';
+        }
+    
+        if (inputLang === 'am') {
+            let transliteratedTextEn = transliterateCustom(text, armenianToEnglishMapping);
+            let transliteratedTextRu = transliterateCustom(text, armenianToRussianMapping);
+            return `${text}, ${transliteratedTextEn}, ${transliteratedTextRu}`;
+        } else if (inputLang === 'ru') {
+            let transliteratedTextEn = transliterateCustom(text, russianToArmenianMapping);
+            let transliteratedTextRu = transliterateCustom(text, russianToEnglishMapping);
+            return `${text}, ${transliteratedTextEn}, ${transliteratedTextRu}`;
+        } else {
+            let transliteratedTextAm = transliterateCustom(text, englishToArmenianMapping);
+            let transliteratedTextRu = transliterateCustom(text, englishToRussianMapping);
+            return `${text}, ${transliteratedTextAm}, ${transliteratedTextRu}`;
+        }
+    };
+    
+    const text = 'xачапури';
+    
+    try {
+        const transliteratedText = transliterateText(text);
+        console.log(transliteratedText); // Output the transliterated text
+    } catch (error) {
+        console.error(error.message);
+    }
+
+    res.send({name:'xss'});
+});
 
 /** Event Loop bug */
 // process.nextTick(() => {
