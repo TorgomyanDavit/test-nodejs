@@ -1,5 +1,6 @@
 import express from "express"
 import session from "express-session"
+import { exec } from 'child_process';
 import EventEmitter from "node:events"
 import path from "path"
 import fs from "fs"
@@ -20,9 +21,9 @@ import cors from "cors";
 import esprima from "esprima"
 // import pkg from 'express-validator';
 // const { sanitizeQuery, sanitizeBody } = pkg;
-
 import helmet from "helmet";
 import hpp from "hpp"
+import { ConstructQuote } from "./thirdPartFunction/index.js";
 // import transliteration from 'transliteration';
 // const { transliterate, createCustomTransliterator } = transliteration;
 
@@ -68,24 +69,22 @@ const armenianToRussianMapping = {
     'յ': 'й', 'ն': 'н', 'շ': 'ш', 'ո': 'о', 'չ': 'ч', 'պ': 'п', 'ջ': 'дж', 'ռ': 'р', 'ս': 'с', 'վ': 'в',
     'տ': 'т', 'ր': 'р', 'ց': 'ц', 'ու': 'у', 'փ': 'п', 'ք': 'к', 'և': 'ев', 'օ': 'о', 'ֆ': 'ф'
 };
+
 const transliterateCustom = (text, mapping) => {
     let result = '';
     for (let i = 0; i < text.length; i++) {
         const currentChar = text[i];
         const nextChar = text[i + 1]; // Get the next character
-
-        if (nextChar !== undefined) { // Check if there's a next character
-            const pair = currentChar + nextChar; // Form a pair of characters
-            if (mapping[pair]) { // Check if the pair exists in the mapping
-                result += mapping[pair]; // Transliterate the pair
-                i++; // Move to the next character
-                continue; // Continue to the next iteration of the loop
-            }
+        const pair = currentChar + nextChar; // Form a pair of characters
+        
+        if (mapping[pair]) { // Check if the pair exists in the mapping
+            result += mapping[pair]; // Transliterate the pair
+            i++; // Move to the next character
+        } else {
+            
+            const mappedChar = mapping[currentChar] || currentChar; // Transliterate the current character individually
+            result += mappedChar;
         }
-
-        // If the pair doesn't exist or there's no next character, transliterate the current character individually
-        const mappedChar = mapping[currentChar] || currentChar; 
-        result += mappedChar;
     }
     return result;
 };
@@ -162,8 +161,12 @@ app.use(hpp());
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
-// Thread /** Workers */
 
+app.set('view engine', 'ejs');
+app.set('views', './src/views'); 
+
+
+// Thread /** Workers */
 const Worker1 = new Worker("./workerOne.js");
 Worker1.on("message",({elapsedMilliseconds,result}) => {
     console.log(`worker 1 Work after ${elapsedMilliseconds} second when run Thread and resuls is ${result}`);
@@ -178,6 +181,63 @@ Worker1.on("message",({elapsedMilliseconds,result}) => {
 // openIaModel.on("message",(msg) => {
 //     console.log(`Message from openIaModel Thread ${msg}`);
 // })
+
+
+app.get('/security', (req, res) => {
+    const params = req.params;
+    const body = req.body;
+    const query = req.query;
+    console.log(query,"query")
+
+    try {
+        const namePath = path.basename(query.name.trim()) // this is secure way to not deep ../../ and read env 
+        const pathNAme = './thirdPartFunction/'+namePath
+        const data = fs.readFileSync(pathNAme, 'utf8');
+        return res.send(data.toString());
+    } catch (err) {
+        console.error('Error reading file:', err);
+    }
+    return res.send(data.toString());
+
+
+
+    // res.send(ConstructQuote(query.name,query.color));
+});
+
+app.get('/exec', (req, res) => {
+    const params = req.params;
+    const body = req.body;
+    const query = req.query;
+    console.log(query,"query")
+
+    // try {
+    //     exec('dir', (error, stdout, stderr) => {
+    //       if (error) {
+    //         console.error(`exec error: ${error}`);
+    //         return;
+    //       }
+    //       console.log(`stdout: ${stdout}`);
+    //       console.error(`stderr: ${stderr}`);
+    //     });
+    // } catch (err) {
+    //     console.error('Error occurred:', err);
+    // }
+
+    try {
+        exec('curl https://jsonplaceholder.typicode.com/todos/1', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+        });
+    } catch (err) {
+        console.error('Error occurred:', err);
+    }
+
+    res.send({name:'Exec for terminal'});
+});
 
 app.get('/GarbageCollection', (req, res) => {
     let allocatedMemory = [];
@@ -283,21 +343,22 @@ app.get('/buffer', async(req, res) => {
 });
 
 app.get('/resize/:image/:width/:height', (req, res) => {
-    const { image, width, height } = req.params;
+    // const { image, width, height } = req.params;
   
-    // Path to the original image (replace with your actual image path)
-    const imagePath = path.resolve('images', image);
+    // // Path to the original image (replace with your actual image path)
+    // const imagePath = path.resolve('images', image);
   
-    sharp(imagePath)
-        .resize(Number(width), Number(height), { fit: 'inside' })
-        .toBuffer()
-        .then((data) => {
-            res.set('Content-Type', 'image/jpeg'); // Set the appropriate content type
-            res.send(data);
-        })
-        .catch((err) => {
-            res.status(500).send('Error resizing image');
-        });
+    // sharp(imagePath)
+    //     .resize(Number(width), Number(height), { fit: 'inside' })
+    //     .toBuffer()
+    //     .then((data) => {
+    //         res.set('Content-Type', 'image/jpeg'); // Set the appropriate content type
+    //         res.send(data);
+    //     })
+    //     .catch((err) => {
+    //         res.status(500).send('Error resizing image');
+    //     });
+
 
     res.send({data:"this route about /resize/:image/:width/:height"});
 
@@ -498,18 +559,6 @@ app.get('/parserAbstreactSyntaxTreeV8', async (req, res) => {
     res.send({name:'parserAbstreactSyntaxTreeV8'});
 });
 
-app.get('/pollution', (req, res) => {
-    const params = req.params;
-    const body = req.body;
-    const query = req.query;
-
-    console.log(params,"params")
-    console.log(body,"body")
-    console.log(query,"query")
-
-
-    res.send({name:'xss'});
-});
 
 /** Event Loop bug */
 // process.nextTick(() => {
