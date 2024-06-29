@@ -1,10 +1,10 @@
 const submit = document.getElementById("button")
 const div = document.querySelector(".innerDiv")
 
-submit.addEventListener('click',() => {
-    const inputValue = document.getElementById('inputField').value;
-    div.innerHTML = '<p>' + inputValue + '</p>'
-})
+// submit.addEventListener('click',async () => {
+//     const inputValue = document.getElementById('inputField').value;
+//     div.innerHTML = '<p>' + inputValue + '</p>'
+// })
 
 // submit.addEventListener("click",async () => {
 //     const data = await axios.get('/openia')
