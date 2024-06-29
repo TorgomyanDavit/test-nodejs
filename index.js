@@ -96,11 +96,6 @@ app.get('/TelegramBot', (req, res) => {
     res.send({data:"Hello World"});
 });
 
-
-
-
-
-
 // Thread /** Workers */
 const Worker1 = new Worker("./workerOne.js");
 Worker1.on("message",({elapsedMilliseconds,result}) => {
