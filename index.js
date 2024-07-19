@@ -25,99 +25,101 @@ import TelegramBot from 'node-telegram-bot-api';
 import helmet from "helmet";
 import hpp from "hpp"
 import { ConstructQuote } from "./thirdPartFunction/index.js";
+import util from "util"
+import Decimal from 'decimal.js';
 // import transliteration from 'transliteration';
 // const { transliterate, createCustomTransliterator } = transliteration;
 import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
 
 
-const armenianToEnglishMapping = {
-    'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'ë', 'թ': 't', 'ժ': 'zh',
-    'ի': 'i', 'լ': 'l', 'խ': 'x', 'ծ': 'c', 'կ': 'k', 'հ': 'h', 'ձ': 'dz', 'ղ': 'gh', 'ճ': 'tch', 'մ': 'm',
-    'յ': 'y', 'ն': 'n', 'շ': 'sh', 'ո': 'o', 'չ': 'ch', 'պ': 'p', 'ջ': 'j', 'ռ': 'r', 'ս': 's', 'վ': 'v',
-    'տ': 't', 'ր': 'r', 'ց': 'c', 'ու': 'u', 'փ': 'p', 'ք': 'q', 'և': 'ev', 'օ': 'o', 'ֆ': 'f'
-};
+// const armenianToEnglishMapping = {
+//     'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'ë', 'թ': 't', 'ժ': 'zh',
+//     'ի': 'i', 'լ': 'l', 'խ': 'x', 'ծ': 'c', 'կ': 'k', 'հ': 'h', 'ձ': 'dz', 'ղ': 'gh', 'ճ': 'tch', 'մ': 'm',
+//     'յ': 'y', 'ն': 'n', 'շ': 'sh', 'ո': 'o', 'չ': 'ch', 'պ': 'p', 'ջ': 'j', 'ռ': 'r', 'ս': 's', 'վ': 'v',
+//     'տ': 't', 'ր': 'r', 'ց': 'c', 'ու': 'u', 'փ': 'p', 'ք': 'q', 'և': 'ev', 'օ': 'o', 'ֆ': 'f'
+// };
 
-const englishToRussianMapping = {
-    'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'e': 'е', 'yo': 'ё', 'zh': 'ж', 'z': 'з', 'i': 'и',
-    'y': 'й', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о', 'p': 'п', 'r': 'р', 's': 'с', 't': 'т',
-    'u': 'у', 'f': 'ф', 'h': 'х', 'ts': 'ц', 'ch': 'ч', 'sh': 'ш', 'sch': 'щ', '': 'ъ', 'y': 'ы', '': 'ь',
-    'e': 'э', 'yu': 'ю', 'ya': 'я'
-};
+// const englishToRussianMapping = {
+//     'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'e': 'е', 'yo': 'ё', 'zh': 'ж', 'z': 'з', 'i': 'и',
+//     'y': 'й', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о', 'p': 'п', 'r': 'р', 's': 'с', 't': 'т',
+//     'u': 'у', 'f': 'ф', 'h': 'х', 'ts': 'ц', 'ch': 'ч', 'sh': 'ш', 'sch': 'щ', '': 'ъ', 'y': 'ы', '': 'ь',
+//     'e': 'э', 'yu': 'ю', 'ya': 'я'
+// };
 
-const russianToEnglishMapping = {
-    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i',
-    'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
-    'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '',
-    'э': 'e', 'ю': 'yu', 'я': 'ya'
-};
+// const russianToEnglishMapping = {
+//     'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'zh', 'з': 'z', 'и': 'i',
+//     'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't',
+//     'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '',
+//     'э': 'e', 'ю': 'yu', 'я': 'ya'
+// };
 
-const russianToArmenianMapping = {
-    'а': 'ա', 'б': 'բ', 'в': 'վ', 'г': 'գ', 'д': 'դ', 'е': 'ե', 'ё': 'յո', 'ж': 'ժ', 'з': 'զ', 'и': 'ի',
-    'й': 'յ', 'к': 'կ', 'л': 'լ', 'м': 'մ', 'н': 'ն', 'о': 'ո', 'п': 'պ', 'р': 'ռ', 'с': 'ս', 'т': 'տ',
-    'у': 'ու', 'ф': 'ֆ', 'х': 'խ', 'ц': 'ծ', 'ч': 'չ', 'ш': 'շ', 'щ': 'շչ', 'ъ': '', 'ы': 'ը', 'ь': '',
-    'э': 'է', 'ю': 'յու', 'я': 'յա'
-};
+// const russianToArmenianMapping = {
+//     'а': 'ա', 'б': 'բ', 'в': 'վ', 'г': 'գ', 'д': 'դ', 'е': 'ե', 'ё': 'յո', 'ж': 'ժ', 'з': 'զ', 'и': 'ի',
+//     'й': 'յ', 'к': 'կ', 'л': 'լ', 'м': 'մ', 'н': 'ն', 'о': 'ո', 'п': 'պ', 'р': 'ռ', 'с': 'ս', 'т': 'տ',
+//     'у': 'ու', 'ф': 'ֆ', 'х': 'խ', 'ц': 'ծ', 'ч': 'չ', 'ш': 'շ', 'щ': 'շչ', 'ъ': '', 'ы': 'ը', 'ь': '',
+//     'э': 'է', 'ю': 'յու', 'я': 'յա'
+// };
 
-const armenianToRussianMapping = {
-    'ա': 'а', 'բ': 'б', 'գ': 'г', 'դ': 'д', 'ե': 'е', 'զ': 'з', 'է': 'э', 'ը': 'ы', 'թ': 'т', 'ժ': 'ж',
-    'ի': 'и', 'լ': 'л', 'խ': 'х', 'ծ': 'ц', 'կ': 'к', 'հ': 'х', 'ձ': 'дз', 'ղ': 'г', 'ճ': 'ч', 'մ': 'м',
-    'յ': 'й', 'ն': 'н', 'շ': 'ш', 'ո': 'о', 'չ': 'ч', 'պ': 'п', 'ջ': 'дж', 'ռ': 'р', 'ս': 'с', 'վ': 'в',
-    'տ': 'т', 'ր': 'р', 'ց': 'ц', 'ու': 'у', 'փ': 'п', 'ք': 'к', 'և': 'ев', 'օ': 'о', 'ֆ': 'ф'
-};
+// const armenianToRussianMapping = {
+//     'ա': 'а', 'բ': 'б', 'գ': 'г', 'դ': 'д', 'ե': 'е', 'զ': 'з', 'է': 'э', 'ը': 'ы', 'թ': 'т', 'ժ': 'ж',
+//     'ի': 'и', 'լ': 'л', 'խ': 'х', 'ծ': 'ц', 'կ': 'к', 'հ': 'х', 'ձ': 'дз', 'ղ': 'г', 'ճ': 'ч', 'մ': 'м',
+//     'յ': 'й', 'ն': 'н', 'շ': 'ш', 'ո': 'о', 'չ': 'ч', 'պ': 'п', 'ջ': 'дж', 'ռ': 'р', 'ս': 'с', 'վ': 'в',
+//     'տ': 'т', 'ր': 'р', 'ց': 'ц', 'ու': 'у', 'փ': 'п', 'ք': 'к', 'և': 'ев', 'օ': 'о', 'ֆ': 'ф'
+// };
 
-const transliterateCustom = (text, mapping) => {
-    let result = '';
-    for (let i = 0; i < text.length; i++) {
-        const currentChar = text[i];
-        const nextChar = text[i + 1]; // Get the next character
-        const pair = currentChar + nextChar; // Form a pair of characters
+// const transliterateCustom = (text, mapping) => {
+//     let result = '';
+//     for (let i = 0; i < text.length; i++) {
+//         const currentChar = text[i];
+//         const nextChar = text[i + 1]; // Get the next character
+//         const pair = currentChar + nextChar; // Form a pair of characters
         
-        if (mapping[pair]) { // Check if the pair exists in the mapping
-            result += mapping[pair]; // Transliterate the pair
-            i++; // Move to the next character
-        } else {
+//         if (mapping[pair]) { // Check if the pair exists in the mapping
+//             result += mapping[pair]; // Transliterate the pair
+//             i++; // Move to the next character
+//         } else {
             
-            const mappedChar = mapping[currentChar] || currentChar; // Transliterate the current character individually
-            result += mappedChar;
-        }
-    }
-    return result;
-};
+//             const mappedChar = mapping[currentChar] || currentChar; // Transliterate the current character individually
+//             result += mappedChar;
+//         }
+//     }
+//     return result;
+// };
 
-const transliterateText = (text) => {
-    let inputLang;
-    if (armenianToEnglishMapping[text[0]]) {
-        inputLang = 'am';
-    } else if (russianToEnglishMapping[text[0]]) {
-        inputLang = 'ru';
-    } else {
-        inputLang = 'en';
-    }
+// const transliterateText = (text) => {
+//     let inputLang;
+//     if (armenianToEnglishMapping[text[0]]) {
+//         inputLang = 'am';
+//     } else if (russianToEnglishMapping[text[0]]) {
+//         inputLang = 'ru';
+//     } else {
+//         inputLang = 'en';
+//     }
 
-    if (inputLang === 'am') {
-        let transliteratedTextEn = transliterateCustom(text, armenianToEnglishMapping);
-        let transliteratedTextRu = transliterateCustom(text, armenianToRussianMapping);
-        return `${text}, ${transliteratedTextEn}, ${transliteratedTextRu}`;
-    } else if (inputLang === 'ru') {
-        let transliteratedTextEn = transliterateCustom(text, russianToArmenianMapping);
-        let transliteratedTextRu = transliterateCustom(text, russianToEnglishMapping);
-        return `${text}, ${transliteratedTextEn}, ${transliteratedTextRu}`;
-    } else {
-        let transliteratedTextAm = transliterateCustom(text, englishToArmenianMapping);
-        let transliteratedTextRu = transliterateCustom(text, englishToRussianMapping);
-        return `${text}, ${transliteratedTextAm}, ${transliteratedTextRu}`;
-    }
-};
+//     if (inputLang === 'am') {
+//         let transliteratedTextEn = transliterateCustom(text, armenianToEnglishMapping);
+//         let transliteratedTextRu = transliterateCustom(text, armenianToRussianMapping);
+//         return `${text}, ${transliteratedTextEn}, ${transliteratedTextRu}`;
+//     } else if (inputLang === 'ru') {
+//         let transliteratedTextEn = transliterateCustom(text, russianToArmenianMapping);
+//         let transliteratedTextRu = transliterateCustom(text, russianToEnglishMapping);
+//         return `${text}, ${transliteratedTextEn}, ${transliteratedTextRu}`;
+//     } else {
+//         let transliteratedTextAm = transliterateCustom(text, englishToArmenianMapping);
+//         let transliteratedTextRu = transliterateCustom(text, englishToRussianMapping);
+//         return `${text}, ${transliteratedTextAm}, ${transliteratedTextRu}`;
+//     }
+// };
 
-const text = 'xачапури';
+// const text = 'xачапури';
 
-try {
-    const transliteratedText = transliterateText(text);
-    console.log(transliteratedText); // Output the transliterated text
-} catch (error) {
-    console.error(error.message);
-}
+// try {
+//     const transliteratedText = transliterateText(text);
+//     console.log(transliteratedText); // Output the transliterated text
+// } catch (error) {
+//     console.error(error.message);
+// }
 
 
 
@@ -204,6 +206,7 @@ Worker1.on("message",({elapsedMilliseconds,result}) => {
 //     console.log(`Message from openIaModel Thread ${msg}`);
 // })
 
+<<<<<<< HEAD
 let model;
 
 let tags = [
@@ -380,25 +383,132 @@ app.post('/tensorf-suggest-tags', async (req, res) => {
     }
 });
 
+=======
+>>>>>>> dcd1d4d520d7ae33008f8a380cdd879617ebdcda
 app.get('/security', (req, res) => {
     const params = req.params;
     const body = req.body;
     const query = req.query;
     console.log(query,"query")
 
+    const myPrice = 5
+    // this incorect example 
+    const count = parseInt(0.000005) // 0 
+    const count2 = parseInt(0.0000005) // 5
+    // console.log(myPrice - count)
+    // console.log(myPrice - count2)
+
+    const result1 = new Decimal(5).minus(new Decimal(0.005));
+    console.log(result1)
+
+    // try {
+    //     const namePath = path.basename(query.name.trim()) // this is secure way to not deep ../../ and read env 
+    //     const pathNAme = './thirdPartFunction/'+namePath
+    //     const data = fs.readFileSync(pathNAme, 'utf8');
+    //     return res.send(data.toString());
+    // } catch (err) {
+    //     console.error('Error reading file:', err);
+    // }
+
+
+    res.send(ConstructQuote(query.name,query.color));
+});
+
+app.get('/securityFloatParseInt', (req, res) => {
+    const params = req.params;
+    const body = req.body;
+    const query = req.query;
+    console.log(query,"query")
+
+    const myPrice = 5
+    // this incorect example 
+    const count = parseInt(0.000005) // 0 
+    const count2 = parseInt(0.0000005) // 5
+    // console.log(myPrice - count)
+    // console.log(myPrice - count2)
+
+    const result1 = new Decimal(5).minus(new Decimal(0.005));
+    console.log(result1)
+
+    res.send(ConstructQuote(query.name,query.color));
+});
+
+app.get('/securitySafetyFile', async (req, res) => {
+    // const params = req.params;
+    // const body = req.body;
+    const query = req.query;
+    console.log(query, "query");
+
+    const ALLOWED_BASE_DIRECTORY = path.resolve('./thirdPartFunction');
+
+    // Function to sanitize file path
+    function sanitizeFilePath(filePath) {
+        const absolutePath = path.resolve(ALLOWED_BASE_DIRECTORY, filePath);
+        if (!absolutePath.startsWith(ALLOWED_BASE_DIRECTORY)) {
+            throw new Error('Path traversal detected');
+        }
+        return absolutePath;
+    }
+
+    // Function to safely access the file
+    async function safeFileAccess(filePath) {
+        try {
+            const sanitizedPath = sanitizeFilePath(filePath);
+            await util.promisify(fs.access)(sanitizedPath, fs.constants.R_OK); // Check if file is readable
+            return sanitizedPath;
+        } catch (error) {
+            console.error('Error accessing file:', error);
+            throw error;
+        }
+    }
+
     try {
-        const namePath = path.basename(query.name.trim()) // this is secure way to not deep ../../ and read env 
-        const pathNAme = './thirdPartFunction/'+namePath
-        const data = fs.readFileSync(pathNAme, 'utf8');
+        const sanitizedPath = await safeFileAccess(query.name.trim());
+        const data = fs.readFileSync(sanitizedPath, 'utf8');
         return res.send(data.toString());
     } catch (err) {
         console.error('Error reading file:', err);
+        return res.status(500).send(err.message);
     }
-    return res.send(data.toString());
+});
 
+app.get('/security', async (req, res) => {
+    // const params = req.params;
+    // const body = req.body;
+    const query = req.query;
+    console.log(query, "query");
 
+    const ALLOWED_BASE_DIRECTORY = path.resolve('./thirdPartFunction');
 
-    // res.send(ConstructQuote(query.name,query.color));
+    // Function to sanitize file path
+    function sanitizeFilePath(filePath) {
+        const absolutePath = path.resolve(ALLOWED_BASE_DIRECTORY, filePath);
+        if (!absolutePath.startsWith(ALLOWED_BASE_DIRECTORY)) {
+            throw new Error('Path traversal detected');
+        }
+        return absolutePath;
+    }
+
+    // Function to safely access the file
+    async function safeFileAccess(filePath) {
+        try {
+            const sanitizedPath = sanitizeFilePath(filePath);
+            await util.promisify(fs.access)(sanitizedPath, fs.constants.R_OK); // Check if file is readable
+            return sanitizedPath;
+        } catch (error) {
+            console.error('Error accessing file:', error);
+            throw error;
+        }
+    }
+
+    try {
+        const sanitizedPath = await safeFileAccess(query.name.trim());
+        const data = fs.readFileSync(sanitizedPath, 'utf8');
+        return res.send(data.toString());
+    } catch (err) {
+        console.error('Error reading file:', err);
+        return res.status(500).send(err.message);
+    }
 });
 
 app.get('/exec', (req, res) => {
