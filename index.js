@@ -33,6 +33,9 @@ import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
 
 
+
+
+
 // const armenianToEnglishMapping = {
 //     'ա': 'a', 'բ': 'b', 'գ': 'g', 'դ': 'd', 'ե': 'e', 'զ': 'z', 'է': 'e', 'ը': 'ë', 'թ': 't', 'ժ': 'zh',
 //     'ի': 'i', 'լ': 'l', 'խ': 'x', 'ծ': 'c', 'կ': 'k', 'հ': 'h', 'ձ': 'dz', 'ղ': 'gh', 'ճ': 'tch', 'մ': 'm',
@@ -123,13 +126,13 @@ import * as use from '@tensorflow-models/universal-sentence-encoder';
 
 
 
-// // export const pool = createPool({
-// //     host: process.env.db_host, // Replace with your host name
-// //     user: process.env.db_user, // Replace with your root name
-// //     password: process.env.db_password, // Replace with your database password
-// //     database: process.env.db_name, // Replace with your database Name
-// //     multipleStatements: true
-// // });
+export const pool = createPool({
+    host: process.env.db_host, // Replace with your host name
+    user: process.env.db_user, // Replace with your root name
+    password: process.env.db_password, // Replace with your database password
+    database: process.env.db_name, // Replace with your database Name
+    multipleStatements: true
+});
 
 const app = express()
 app.use(session({
@@ -164,9 +167,70 @@ app.use(express.static("public"))
 app.set('view engine', 'ejs');
 app.set('views', './src/views'); 
 
+const happyFlowerTags = [
+    "joy", "celebration", "congratulations", "cheer", "delight", "happiness",
+    "joyful", "bright blooms", "cheerful bouquet", "festive", "happy vibes",
+    "love", "romance", "friendship", "thank you", "appreciation", "gratitude",
+    "birthday", "anniversary", "wedding", "engagement", "new baby", 
+    "bright", "vibrant", "radiant", "colorful", "sunny", "smile",
+    "yellow", "orange", "pink", "red", "purple", "blue", "white", "green",
+    "daisy", "sunflower", "tulip", "lily", "rose", "daffodil", "gerbera",
+    "orchid", "marigold", "peony", "zinnia", "chrysanthemum", "carnation",
+    "hibiscus", "lilac", "freesia", "magnolia", "ranunculus", "snapdragon",
+    "anemone", "New Year's Day", "Valentine's Day", "Easter", "Mother's Day",
+    "Father's Day", "Thanksgiving", "Christmas", "Hanukkah", "Graduation",
+    "Promotion", "Housewarming", "Baby Shower", "Retirement", "March 8", "April 8"
+];
+
+const happyFlowerTagsAm = [
+    "ուրախություն", "տոնակատարություն", "շնորհավորանքներ", "ուրախություն", "երջանկություն",
+    "ուրախ", "վառ ծաղիկներ", "ուրախ բուկետ", "տոնական", "երջանիկ տրամադրություններ",
+    "սեր", "հարաբերություն", "ընկերություն", "շնորհակալություն", "գնահատում", "երախտագիտություն",
+    "ծննդյան օր", "ամուսնության տարեդարձ", "հարսանիք", "նշանադրություն", "նորածին", 
+    "վառ", "վառվռուն", "շողշողուն", "գունավոր", "արևոտ", "ժպիտ",
+    "դեղին", "նարնջագույն", "վարդագույն", "կարմիր", "մանուշակագույն", "կապույտ", "սպիտակ", "կանաչ",
+    "մարգարիտ", "արևածաղիկ", "կակաչ", "շուշան", "վարդ", "նարգիզ", "գերբերա",
+    "խոլորձ", "շուշան", "բունտ", "ճիզվիթ", "կարնացիա",
+    "հիբիսկուս", "մանուշակ", "ֆրեզիա", "մագնոլիա", "համբույր", "կոճապղպեղ",
+    "անեմոն", "Նոր տարվա օր", "Սիրո օրը", "Զատիկ", "Մայրիկի օր",
+    "Հայրիկի օր", "Շնորհակալություն", "Ծնունդ", "Հանուկա", "Ավարտ",
+    "Խթանում", "Տանուտ", "Նորածնի ցնցում", "Թոշակառուություն", "Մարտի 8", "Ապրիլի 8"
+];
+
+const imageUrl = 'https://cdn.pixabay.com/photo/2020/07/08/08/07/daisy-5383056_1280.jpg';
+const tagType = 1;
+
+app.get('/insertTags', async (req, res) => {
+    const values = happyFlowerTags.map(tag => [tag, tagType, imageUrl]);
+    const valuesTranslation = happyFlowerTagsAm.map((tag,index) => [index + 1, "am", tag]);
+
+
+    console.log(values.length)
+    console.log(valuesTranslation.length)
+
+    // try {
+    //     const [result] = await pool.query(`INSERT INTO flowers.tags (tag_name, tag_type, image_url) VALUES ?`, [values]);
+    //     console.log('Data inserted successfully:', result);
+    //     res.send({ data: "Hello World" });
+    // } catch (err) {
+    //     console.error('Error inserting data:', err);
+    //     res.status(500).send({ error: 'Error inserting data' });
+    // }
+
+    // try {
+    //     const [result] = await pool.query('INSERT INTO flowers.tags_translation (tags_id, language_code, translated_tag_name) VALUES ?', [valuesTranslation]);
+    //     console.log('Translations inserted successfully:', result);
+    //     res.send({ data: "Translations inserted successfully" });
+    // } catch (err) {
+    //     console.error('Error inserting translations:', err);
+    //     res.status(500).send({ error: 'Error inserting translations' });
+    // }
+
+    res.status(500).send({ error: 'Error inserting translations' });
+
+});
+
 // Telegram bot
-
-
 app.get('/TelegramBot', (req, res) => {
     const bot = new TelegramBot(process.env.TELEGRAMTOKEN, { polling: true });
 
@@ -205,6 +269,193 @@ Worker1.on("message",({elapsedMilliseconds,result}) => {
 // openIaModel.on("message",(msg) => {
 //     console.log(`Message from openIaModel Thread ${msg}`);
 // })
+
+let model;
+
+let tags = [
+    // **Flower Types and Bouquets**
+    // Specific flower types and bouquet-related terms
+    "rose",          // Classic symbol of love and beauty
+    "bouquet",       // General term for a collection of flowers
+    "lily",          // Elegant and popular flower often used in arrangements
+    "orchid",        // Exotic and beautiful flower for sophisticated bouquets
+    "daisy",         // Cheerful and simple flower symbolizing innocence
+    "tulip",         // Bright and vibrant flower often associated with spring
+    "sunflower",     // Large, cheerful flower symbolizing happiness
+    "peony",         // Romantic and lush flower often used in celebrations
+    "daffodil",      // Spring flower symbolizing new beginnings
+    "hydrangea",     // Full and beautiful flower often used in elegant bouquets
+    "chrysanthemum", // Flower symbolizing optimism and joy
+    "carnation",     // Versatile flower used in a variety of bouquets
+    "lavender",      // Fragrant flower associated with calm and peace
+    "poppy",         // Bright and attractive flower symbolizing remembrance
+    "iris",          // Elegant flower often associated with faith and hope
+    "marigold",      // Bright flower symbolizing positive energy
+    "jasmine",       // Fragrant flower symbolizing love and beauty
+    "geranium",      // Cheerful flower often used in garden bouquets
+    "freesia",       // Fragrant and colorful flower used in elegant arrangements
+    "hibiscus",      // Tropical flower symbolizing beauty and happiness
+    "magnolia",      // Large and beautiful flower symbolizing dignity
+    "azalea",        // Colorful flower often used in decorative arrangements
+    "camellia",      // Elegant flower symbolizing admiration and perfection
+    "pansy",         // Charming flower often used in cheerful bouquets
+    "begonia",       // Flower known for its vibrant colors and beauty
+    "ranunculus",    // Elegant flower symbolizing radiant charm
+    "snapdragon",    // Unique flower used in joyful and vibrant bouquets
+    "zinnia",        // Bright flower symbolizing endurance and cheerfulness
+
+    // **Bouquet Types**
+    // Specific types of flower bouquets
+    "flower arrangement",   // General term for arranged flowers
+    "hand-tied bouquet",    // Bouquet made by tying flowers together
+    "floral centerpiece",   // Arrangement designed as a table centerpiece
+    "wedding bouquet",      // Bouquet specifically designed for weddings
+    "bridal bouquet",       // Bouquet for the bride
+    "birthday bouquet",     // Bouquet for celebrating birthdays
+    "anniversary bouquet",  // Bouquet for celebrating anniversaries
+    "thank you bouquet",    // Bouquet to express gratitude
+    "congratulations bouquet", // Bouquet for congratulating achievements
+    "get well soon bouquet", // Bouquet to wish someone a speedy recovery
+
+    // **Colors and Themes Related to Happiness**
+    // Colors and terms that express joy and positive emotions
+    "pink",          // Color often associated with love and joy
+    "red",           // Bold color symbolizing passion and excitement
+    "yellow",        // Bright color symbolizing happiness and cheerfulness
+    "blue",          // Calm color often associated with peace and tranquility
+    "white",         // Color symbolizing purity and simplicity
+    "orange",        // Warm color symbolizing enthusiasm and warmth
+    "purple",        // Color often associated with creativity and joy
+    "green",         // Color symbolizing nature and freshness
+    "bright",        // General term for something cheerful and eye-catching
+    "vibrant",       // Colorful and lively appearance
+    "radiant",       // Bright and shining appearance
+
+    // **Peace and Serenity**
+    // Terms associated with peace and serenity
+    "peace",         // State of tranquility and calm
+    "serenity",      // Quality of being peaceful and calm
+    "comfort",       // Providing a sense of ease and consolation
+    "calm",          // Peaceful and relaxing state
+    "soothing",      // Gentle and comforting
+    "gentle",        // Mild and tender
+    "rest",          // State of relaxation and peace
+    "tranquility",   // Peaceful and serene atmosphere
+    "harmony",       // Pleasant and balanced state of being
+    "relaxation",    // State of being free from tension or anxiety
+
+    // **General Happiness Themes**
+    // Terms reflecting general themes of happiness and joy
+    "joy",           // Deep happiness and delight
+    "happiness",     // General state of well-being and joy
+    "smile",         // Expression of joy and friendliness
+    "gratitude",     // Feeling of thankfulness and appreciation
+    "celebrate",     // Act of rejoicing and marking a special occasion
+    "festivity",     // Atmosphere of celebration and joy
+    "jubilation",    // Feeling of great joy and celebration
+    "cheerful",      // Happy and positive attitude
+    "delight",       // Pleasure and joy
+    "happy occasion",// A special moment of joy and celebration
+    "joyful",        // Full of happiness and delight
+    "pleasant",      // Enjoyable and satisfying
+    "uplifting",     // Raising spirits and providing joy
+    "inspire",       // Motivating and encouraging positive feelings
+    "fun",           // Enjoyable and entertaining experience
+    "lovely",        // Pleasant and delightful
+    "charming",      // Attractive and pleasing
+    "wonderful",     // Full of happiness and amazement
+    "graceful",      // Elegant and pleasing to the eye
+
+    // **Additional Happiness Themes**
+    "brighten day",  // Making someone's day better
+    "thankful heart" // Feeling of deep gratitude
+];
+
+// https://cdn.pixabay.com/photo/2020/07/08/08/07/daisy-5383056_1280.jpg
+const sadFlowerTags = [
+    "sympathy", "condolences", "funeral", "mourning", "grief", "loss",
+    "remembrance", "tribute", "comfort", "support", "peace", "heartfelt",
+    "solace", "serenity", "memorial", "compassion", "empathy", "sadness",
+    "hope", "farewell", "comfort blooms", "peaceful rest", "in loving memory",
+    "grieving", "soft tones", "gentle bouquet", "hopeful wishes", "soothing",
+    "sorrow", "loving tribute", "rest in peace", "quiet reflection",
+    "sincere condolences", "farewell bouquet", "sadness bouquet", 
+    "sympathy arrangement",
+    "pink",          
+    "red",        
+    "yellow",       
+    "blue",          
+    "white",         
+    "orange",        
+    "purple",        
+    "green",         
+    "bright",       
+    "vibrant",       
+    "radiant",      
+];
+
+
+let tagEmbeddings = [];
+
+// Load the Universal Sentence Encoder model
+use.load().then((loadedModel) => {
+    model = loadedModel;
+    computeEmbeddings(tags).then((embeddings) => {
+        tagEmbeddings = embeddings;
+        console.log('Tag embeddings computed');
+    });
+});
+
+async function computeEmbeddings(sentences) {
+    const embeddings = await model.embed(sentences);
+    return embeddings.arraySync();
+}
+
+function cosineSimilarity(A, B) {
+    const dotProduct = A.map((val, i) => val * B[i]).reduce((acc, curr) => acc + curr, 0);
+    const magnitudeA = Math.sqrt(A.map(val => val * val).reduce((acc, curr) => acc + curr, 0));
+    const magnitudeB = Math.sqrt(B.map(val => val * val).reduce((acc, curr) => acc + curr, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+}
+
+app.post('/tensorf-suggest-tags', async (req, res) => {
+    const { selectedTags } = req.body;
+    if (!model) {
+        return res.status(503).json({ error: 'Model is loading, please try again later' });
+    }
+
+    if (!selectedTags || selectedTags.length === 0) {
+        return res.status(400).json({ error: 'No selectedTags provided' });
+    }
+
+    try {
+        const selectedEmbeddings = await computeEmbeddings(selectedTags);
+        const suggestedTags = new Set();
+
+        for (const selectedEmbedding of selectedEmbeddings) {
+            for (let j = 0; j < tagEmbeddings.length; j++) {
+                const tagEmbedding = tagEmbeddings[j];
+                const similarity = cosineSimilarity(selectedEmbedding, tagEmbedding);
+
+                if (similarity > 0.6) {  // Adjusted to a more appropriate threshold
+                    suggestedTags.add(tags[j]);
+                }
+            }
+        }
+
+        // Remove already selected tags from suggestions
+        selectedTags.forEach(tag => suggestedTags.delete(tag));
+
+        // Convert set to array and filter out tags with very low relevance
+        const result = Array.from(suggestedTags).filter(tag => tag !== "" && tag !== null);
+
+        res.send({ data: result });
+
+    } catch (error) {
+        console.error('Error during tag suggestion:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
 
 app.get('/security', (req, res) => {
     const params = req.params;
