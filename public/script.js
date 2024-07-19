@@ -1,6 +1,36 @@
 const submit = document.getElementById("button")
 const div = document.querySelector(".innerDiv")
 
+
+
+submit.addEventListener('click',async () => {
+    const inputValue = document.getElementById('inputField').value
+    async function fetchSuggestedTags(selectedTags) {
+        try {
+            const response = await fetch('/tensorf-suggest-tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ selectedTags })
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const data = await response.json();
+            console.log(data)
+            
+            return data;
+        } catch (error) {
+            console.error('Error fetching suggested tags:', error);
+            return [];
+        }
+    }
+    fetchSuggestedTags([inputValue])
+})
+
 // submit.addEventListener('click',async () => {
 //     const inputValue = document.getElementById('inputField').value;
 //     div.innerHTML = '<p>' + inputValue + '</p>'
