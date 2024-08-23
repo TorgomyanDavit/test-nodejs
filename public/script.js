@@ -2,10 +2,14 @@ const submit = document.getElementById("button")
 const div = document.querySelector(".innerDiv")
 
 submit.addEventListener("click",async () => {
-    const data = await fetch('http://localhost:5000/insertTags')
-    debugger
+    const data = await fetch('http://localhost:8000/createInterface')
     console.log(data)
 })
+
+// submit.addEventListener("click",async () => {
+//     const data = await fetch('http://localhost:8000/insertTags')
+//     console.log(data)
+// })
 
 // submit.addEventListener('click',async () => {
 //     const inputValue = document.getElementById('inputField').value
@@ -61,7 +65,7 @@ submit.addEventListener("click",async () => {
 // })();
 
 // (async function() {
-//     const data = await axios.get(`http://localhost:5000/getOs`)
+//     const data = await axios.get(`http://localhost:8000/getOs`)
 //     console.log(data);
 // })();
 

@@ -31,7 +31,8 @@ import Decimal from 'decimal.js';
 // const { transliterate, createCustomTransliterator } = transliteration;
 import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
-
+import readline from 'node:readline';
+import { stdin as input, stdout as output } from 'node:process';
 
 
 
@@ -167,55 +168,73 @@ app.use(express.static("public"))
 app.set('view engine', 'ejs');
 app.set('views', './src/views'); 
 
-const happyFlowerTags = [
-    "joy", "celebration", "congratulations", "cheer", "delight", "happiness",
-    "joyful", "bright blooms", "cheerful bouquet", "festive", "happy vibes",
-    "love", "romance", "friendship", "thank you", "appreciation", "gratitude",
-    "birthday", "anniversary", "wedding", "engagement", "new baby", 
-    "bright", "vibrant", "radiant", "colorful", "sunny", "smile",
-    "yellow", "orange", "pink", "red", "purple", "blue", "white", "green",
-    "daisy", "sunflower", "tulip", "lily", "rose", "daffodil", "gerbera",
-    "orchid", "marigold", "peony", "zinnia", "chrysanthemum", "carnation",
-    "hibiscus", "lilac", "freesia", "magnolia", "ranunculus", "snapdragon",
-    "anemone", "New Year's Day", "Valentine's Day", "Easter", "Mother's Day",
-    "Father's Day", "Thanksgiving", "Christmas", "Hanukkah", "Graduation",
-    "Promotion", "Housewarming", "Baby Shower", "Retirement", "March 8", "April 8"
-];
 
-const happyFlowerTagsAm = [
-    "ուրախություն", "տոնակատարություն", "շնորհավորանքներ", "ուրախություն", "հրճվանք", "երջանկություն",
-    "ուրախ", "վառ ծաղիկներ", "ուրախ բուկետ", "տոնական", "երջանիկ տրամադրություններ",
-    "սեր", "ռոմանտիկա", "ընկերություն", "շնորհակալություն", "գնահատում", "երախտագիտություն",
-    "ծննդյան օր", "ամուսնության տարեդարձ", "հարսանիք", "նշանադրություն", "նորածին", 
-    "վառ", "վառվռուն", "շողշողուն", "գունավոր", "արևոտ", "ժպիտ",
-    "դեղին", "նարնջագույն", "վարդագույն", "կարմիր", "մանուշակագույն", "կապույտ", "սպիտակ", "կանաչ",
-    "մարգարիտ", "արևածաղիկ", "կակաչ", "շուշան", "վարդ", "նարգիզ", "գերբերա",
-    "խոլորձ", "մարգարիտ", "փիոն", "ցինիա", "քրիզանթեմ", "կարնացիա",
-    "հիբիսկուս", "մանուշակ", "ֆրեզիա", "մագնոլիա", "համբույր ծաղիկ", "շնաձուկ ծաղիկ",
-    "անեմոն", "Նոր տարվա օր", "Սիրո օրը", "Զատիկ", "Մայրիկի օր",
-    "Հայրիկի օր", "Շնորհակալություն", "Ծնունդ", "Հանուկա", "Ավարտ",
-    "Խթանում", "Տանուտ", "Նորածնի ցնցում", "Թոշակառուություն", "Մարտի 8", "Ապրիլի 8"
-];
+app.get('/createInterface', async (req, res) => {
 
-const happyFlowerTagsRu = [
-    "радость", "празднование", "поздравления", "веселье", "восторг", "счастье",
-    "радостный", "яркие цветы", "веселый букет", "праздничный", "счастливые настроения",
-    "любовь", "романтика", "дружба", "спасибо", "признательность", "благодарность",
-    "день рождения", "годовщина", "свадьба", "помолвка", "новорожденный", 
-    "яркий", "жизнерадостный", "сияющий", "цветной", "солнечный", "улыбка",
-    "желтый", "оранжевый", "розовый", "красный", "фиолетовый", "синий", "белый", "зеленый",
-    "маргаритка", "подсолнух", "тюльпан", "лилия", "роза", "нарцисс", "гербера",
-    "орхидея", "мариголд", "пион", "цинния", "хризантема", "гвоздика",
-    "гибискус", "сирень", "фрезия", "магнолия", "ранункулюс", "анютины глазки",
-    "анемон", "Новый год", "День Святого Валентина", "Пасха", "День матери",
-    "День отца", "День благодарения", "Рождество", "Ханука", "Выпускной",
-    "Повышение", "Новоселье", "Детский душ", "Выход на пенсию", "8 марта", "8 апреля"
-];
+    const rl = readline.createInterface({ input, output });
 
-const imageUrl = 'https://cdn.pixabay.com/photo/2020/07/08/08/07/daisy-5383056_1280.jpg';
-const tagType = 1;
+    rl.question('What do you think of Node.js? ', (answer) => {
+      console.log(`Thank you for your valuable feedback: ${answer}`);
+      rl.close();
+    });
+    
+    rl.on('close', () => {
+      console.log('\nBYE BYE !!!');
+    });
+    
+    res.send({hi:"hi"})
+});
+
 
 app.get('/insertTags', async (req, res) => {
+    const happyFlowerTags = [
+        "joy", "celebration", "congratulations", "cheer", "delight", "happiness",
+        "joyful", "bright blooms", "cheerful bouquet", "festive", "happy vibes",
+        "love", "romance", "friendship", "thank you", "appreciation", "gratitude",
+        "birthday", "anniversary", "wedding", "engagement", "new baby", 
+        "bright", "vibrant", "radiant", "colorful", "sunny", "smile",
+        "yellow", "orange", "pink", "red", "purple", "blue", "white", "green",
+        "daisy", "sunflower", "tulip", "lily", "rose", "daffodil", "gerbera",
+        "orchid", "marigold", "peony", "zinnia", "chrysanthemum", "carnation",
+        "hibiscus", "lilac", "freesia", "magnolia", "ranunculus", "snapdragon",
+        "anemone", "New Year's Day", "Valentine's Day", "Easter", "Mother's Day",
+        "Father's Day", "Thanksgiving", "Christmas", "Hanukkah", "Graduation",
+        "Promotion", "Housewarming", "Baby Shower", "Retirement", "March 8", "April 8"
+    ];
+    
+    const happyFlowerTagsAm = [
+        "ուրախություն", "տոնակատարություն", "շնորհավորանքներ", "ուրախություն", "հրճվանք", "երջանկություն",
+        "ուրախ", "վառ ծաղիկներ", "ուրախ բուկետ", "տոնական", "երջանիկ տրամադրություններ",
+        "սեր", "ռոմանտիկա", "ընկերություն", "շնորհակալություն", "գնահատում", "երախտագիտություն",
+        "ծննդյան օր", "ամուսնության տարեդարձ", "հարսանիք", "նշանադրություն", "նորածին", 
+        "վառ", "վառվռուն", "շողշողուն", "գունավոր", "արևոտ", "ժպիտ",
+        "դեղին", "նարնջագույն", "վարդագույն", "կարմիր", "մանուշակագույն", "կապույտ", "սպիտակ", "կանաչ",
+        "մարգարիտ", "արևածաղիկ", "կակաչ", "շուշան", "վարդ", "նարգիզ", "գերբերա",
+        "խոլորձ", "մարգարիտ", "փիոն", "ցինիա", "քրիզանթեմ", "կարնացիա",
+        "հիբիսկուս", "մանուշակ", "ֆրեզիա", "մագնոլիա", "համբույր ծաղիկ", "շնաձուկ ծաղիկ",
+        "անեմոն", "Նոր տարվա օր", "Սիրո օրը", "Զատիկ", "Մայրիկի օր",
+        "Հայրիկի օր", "Շնորհակալություն", "Ծնունդ", "Հանուկա", "Ավարտ",
+        "Խթանում", "Տանուտ", "Նորածնի ցնցում", "Թոշակառուություն", "Մարտի 8", "Ապրիլի 8"
+    ];
+    
+    const happyFlowerTagsRu = [
+        "радость", "празднование", "поздравления", "веселье", "восторг", "счастье",
+        "радостный", "яркие цветы", "веселый букет", "праздничный", "счастливые настроения",
+        "любовь", "романтика", "дружба", "спасибо", "признательность", "благодарность",
+        "день рождения", "годовщина", "свадьба", "помолвка", "новорожденный", 
+        "яркий", "жизнерадостный", "сияющий", "цветной", "солнечный", "улыбка",
+        "желтый", "оранжевый", "розовый", "красный", "фиолетовый", "синий", "белый", "зеленый",
+        "маргаритка", "подсолнух", "тюльпан", "лилия", "роза", "нарцисс", "гербера",
+        "орхидея", "мариголд", "пион", "цинния", "хризантема", "гвоздика",
+        "гибискус", "сирень", "фрезия", "магнолия", "ранункулюс", "анютины глазки",
+        "анемон", "Новый год", "День Святого Валентина", "Пасха", "День матери",
+        "День отца", "День благодарения", "Рождество", "Ханука", "Выпускной",
+        "Повышение", "Новоселье", "Детский душ", "Выход на пенсию", "8 марта", "8 апреля"
+    ];
+    
+    const imageUrl = 'https://cdn.pixabay.com/photo/2020/07/08/08/07/daisy-5383056_1280.jpg';
+    const tagType = 1;
+
     const values = happyFlowerTags.map(tag => [tag, tagType, imageUrl]);
     const valuesTranslation = happyFlowerTagsRu.map((tag,index) => [index + 1, "ru", tag]); 
 
@@ -407,7 +426,6 @@ const sadFlowerTags = [
     "vibrant",       
     "radiant",      
 ];
-
 
 let tagEmbeddings = [];
 
@@ -1410,8 +1428,8 @@ app.listen(process.env.PORT, () => {
 
 
 
-// app.listen(5000,() => {
-//     console.log(`app run on ${5000} port`);
+// app.listen(8000,() => {
+//     console.log(`app run on ${8000} port`);
 // })
 
 // Queue 
