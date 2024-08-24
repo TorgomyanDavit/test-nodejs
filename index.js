@@ -199,7 +199,37 @@ app.get('/insertTags', async (req, res) => {
         "hibiscus", "lilac", "freesia", "magnolia", "ranunculus", "snapdragon",
         "anemone", "New Year's Day", "Valentine's Day", "Easter", "Mother's Day",
         "Father's Day", "Thanksgiving", "Christmas", "Hanukkah", "Graduation",
-        "Promotion", "Housewarming", "Baby Shower", "Retirement", "March 8", "April 8"
+        "Promotion", "Housewarming", "Baby Shower", "Retirement", "March 8", "April 8",
+        "mourning",
+        "sympathy",
+        "condolences",
+        "grief",
+        "bereavement",
+        "funeral",
+        "remembrance",
+        "memorial",
+        "sorrow",
+        "loss",
+        "tears",
+        "elegant white",
+        "serenity",
+        "peaceful",
+        "calm",
+        "farewell",
+        "tribute",
+        "honor",
+        "quiet reflection",
+        "solace",
+        "comforting blooms",
+        "rest in peace",
+        "gentle bouquet",
+        "sad roses",
+        "white lilies",
+        "soft petals",
+        "gentle garden",
+        "sad arrangements",
+        "pure white",
+        "memorial flowers"
     ];
     
     const happyFlowerTagsAm = [
@@ -214,7 +244,38 @@ app.get('/insertTags', async (req, res) => {
         "հիբիսկուս", "մանուշակ", "ֆրեզիա", "մագնոլիա", "համբույր ծաղիկ", "շնաձուկ ծաղիկ",
         "անեմոն", "Նոր տարվա օր", "Սիրո օրը", "Զատիկ", "Մայրիկի օր",
         "Հայրիկի օր", "Շնորհակալություն", "Ծնունդ", "Հանուկա", "Ավարտ",
-        "Խթանում", "Տանուտ", "Նորածնի ցնցում", "Թոշակառուություն", "Մարտի 8", "Ապրիլի 8"
+        "Խթանում", "Տանուտ", "Նորածնի ցնցում", "Թոշակառուություն", "Մարտի 8", "Ապրիլի 8",
+
+        "ծառայում",
+        "հոգածություն",
+        "խնամք",
+        "տխրություն",
+        "կորստի",
+        "հուղարկավորում",
+        "հիշատակում",
+        "հիշատակի flowers",
+        "սկզբունք",
+        "կորուստ",
+        "լաց",
+        "էլեգանտ սպիտակ",
+        "խաղաղություն",
+        "խաղաղ",
+        "լռակյաց",
+        "հրաժարական",
+        "պարգև",
+        "պատվություն",
+        "խորամանկ մտածում",
+        "հանգստություն",
+        "մխիթարող ծաղիկներ",
+        "միրում խաղաղությամբ",
+        "նուրբ ծաղկաբուծություն",
+        "տխուր վարդեր",
+        "սպիտակ լիլիաներ",
+        "մեղմ ստորջրյա",
+        "նուրբ պարտեզ",
+        "տխուր կոմպոզիցիաներ",
+        "մաքուր սպիտակ",
+        "հիշատակի flowers"
     ];
     
     const happyFlowerTagsRu = [
@@ -229,18 +290,49 @@ app.get('/insertTags', async (req, res) => {
         "гибискус", "сирень", "фрезия", "магнолия", "ранункулюс", "анютины глазки",
         "анемон", "Новый год", "День Святого Валентина", "Пасха", "День матери",
         "День отца", "День благодарения", "Рождество", "Ханука", "Выпускной",
-        "Повышение", "Новоселье", "Детский душ", "Выход на пенсию", "8 марта", "8 апреля"
+        "Повышение", "Новоселье", "Детский душ", "Выход на пенсию", "8 марта", "8 апреля",
+
+        "траур",
+        "соболезнования",
+        "сочувствие",
+        "печаль",
+        "утрата",
+        "похороны",
+        "память",
+        "мемориал",
+        "горе",
+        "потеря",
+        "слезы",
+        "элегантный белый",
+        "спокойствие",
+        "мирный",
+        "спокойный",
+        "прощание",
+        "трибьют",
+        "честь",
+        "тихое размышление",
+        "успокоение",
+        "утешительные цветы",
+        "покойся с миром",
+        "нежный букет",
+        "грустные розы",
+        "белые лилии",
+        "мягкие лепестки",
+        "нежный сад",
+        "грустные композиции",
+        "чистый белый",
+        "памятные цветы"
     ];
     
     const imageUrl = 'https://cdn.pixabay.com/photo/2020/07/08/08/07/daisy-5383056_1280.jpg';
     const tagType = 1;
 
     const values = happyFlowerTags.map(tag => [tag, tagType, imageUrl]);
-    const valuesTranslation = happyFlowerTagsRu.map((tag,index) => [index + 1, "ru", tag]); 
+    const valuesTranslation = happyFlowerTagsAm.map((tag,index) => [index + 1, "am", tag]); 
 
 
     console.log(values.length)
-    console.log(valuesTranslation.length)
+    // console.log(valuesTranslation.length)
 
     // try {
     //     const [result] = await pool.query(`INSERT INTO flowers.tags (tag_name, tag_type, image_url) VALUES ?`, [values]);
@@ -251,14 +343,14 @@ app.get('/insertTags', async (req, res) => {
     //     res.status(500).send({ error: 'Error inserting data' });
     // }
 
-    // try {
-    //     const [result] = await pool.query('INSERT INTO flowers.tags_translation (tags_id, language_code, translated_tag_name) VALUES ?', [valuesTranslation]);
-    //     console.log('Translations inserted successfully:', result);
-    //     res.send({ data: "Translations inserted successfully" });
-    // } catch (err) {
-    //     console.error('Error inserting translations:', err);
-    //     res.status(500).send({ error: 'Error inserting translations' });
-    // }
+    try {
+        const [result] = await pool.query('INSERT INTO flowers.tags_translation (tags_id, language_code, translated_tag_name) VALUES ?', [valuesTranslation]);
+        console.log('Translations inserted successfully:', result);
+        res.send({ data: "Translations inserted successfully" });
+    } catch (err) {
+        console.error('Error inserting translations:', err);
+        res.status(500).send({ error: 'Error inserting translations' });
+    }
 
     // res.status(500).send({ error: 'Error inserting translations' });
 });
