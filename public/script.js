@@ -1,6 +1,7 @@
 const submit = document.getElementById("button")
 const div = document.querySelector(".innerDiv")
 
+<<<<<<< HEAD
 submit.addEventListener("click",async () => {
     const data = await fetch('http://localhost:8000/getNICMacandIPaddress')
     console.log(data)
@@ -13,8 +14,17 @@ submit.addEventListener("click",async () => {
 
 // submit.addEventListener("click",async () => {
 //     const data = await fetch('http://localhost:8000/insertTags')
+=======
+// submit.addEventListener("click",async () => {
+//     const data = await fetch('http://localhost:8000/createInterface')
+>>>>>>> 922a46ecdee9192a4d8a143a83c057ac7faaa9f0
 //     console.log(data)
 // })
+
+submit.addEventListener("click",async () => {
+    const data = await fetch('http://localhost:5000/insertTags')
+    console.log(data)
+})
 
 // submit.addEventListener('click',async () => {
 //     const inputValue = document.getElementById('inputField').value
