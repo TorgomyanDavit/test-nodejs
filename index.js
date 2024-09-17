@@ -33,6 +33,7 @@ import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
 import readline from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
+import multer from 'multer'; // To handle file uploads
 
 
 
@@ -450,6 +451,27 @@ function cosineSimilarity(A, B) {
     return dotProduct / (magnitudeA * magnitudeB);
 }
 
+const upload = multer({ dest: 'uploads/' });
+app.post('/generate-webp-image', upload.single('image'), async (req, res) => {
+    try {
+      const inputPath = req.file.path;
+      const outputPath = `uploads/${req.file.filename}.webp`;
+  
+      // Convert the image to WebP
+      await sharp(inputPath)
+        .webp({ quality: 80 }) // Adjust quality (0-100)
+        .toFile(outputPath);
+  
+      res.status(200).json({
+        message: 'Image converted to WebP successfully',
+        webpImagePath: outputPath,
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Failed to convert image' });
+    }
+  });
+
 app.post('/tensorf-suggest-tags', async (req, res) => {
     const { selectedTags } = req.body;
     if (!model) {
@@ -487,6 +509,38 @@ app.post('/tensorf-suggest-tags', async (req, res) => {
         console.error('Error during tag suggestion:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+app.get('/getNICMacandIPaddress', async (req, res) => {
+
+    const networkInterfaces = os.networkInterfaces();
+
+    const getIpAddress = () => {
+        for (const interfaceName in networkInterfaces) {
+            for (const iface of networkInterfaces[interfaceName]) {
+                if (iface.family === 'IPv4' && !iface.internal) {
+                    return iface.address;
+                }
+            }
+        }
+        return 'IP address not found';
+    };
+    
+    const getMacAddress = () => {
+        for (const interfaceName in networkInterfaces) {
+            for (const iface of networkInterfaces[interfaceName]) {
+                if (!iface.internal) {
+                    return iface.mac;
+                }
+            }
+        }
+        return 'MAC address not found';
+    };
+    
+    console.log('IP Address:', getIpAddress());
+    console.log('MAC Address:', getMacAddress());
+    
+    res.send({data:"response.data"});
 });
 
 app.get('/security', (req, res) => {
@@ -775,10 +829,6 @@ app.get('/resize/:image/:width/:height', (req, res) => {
 
 });
 
-app.get('/rapid', async (req, res) => {
-    res.send({data:"response.data"});
-});
-  
 app.get('/stream', async (req, res) => {
     const readableStream = fs.createReadStream('./file.txt', {
         encoding: 'utf-8'
