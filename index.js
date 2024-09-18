@@ -33,7 +33,7 @@ import * as tf from '@tensorflow/tfjs';
 import * as use from '@tensorflow-models/universal-sentence-encoder';
 import readline from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
-import multer from 'multer'; // To handle file uploads
+import multer from 'multer';
 
 
 
@@ -331,9 +331,7 @@ app.get('/insertTags', async (req, res) => {
     const values = happyFlowerTags.map(tag => [tag, tagType, imageUrl]);
     const valuesTranslation = happyFlowerTagsAm.map((tag,index) => [index + 1, "am", tag]); 
 
-
     console.log(values.length)
-    // console.log(valuesTranslation.length)
 
     // try {
     //     const [result] = await pool.query(`INSERT INTO flowers.tags (tag_name, tag_type, image_url) VALUES ?`, [values]);
@@ -523,13 +521,13 @@ const sadFlowerTags = [
 let tagEmbeddings = [];
 
 // Load the Universal Sentence Encoder model
-use.load().then((loadedModel) => {
-    model = loadedModel;
-    computeEmbeddings(tags).then((embeddings) => {
-        tagEmbeddings = embeddings;
-        console.log('Tag embeddings computed');
-    });
-});
+// use.load().then((loadedModel) => {
+//     model = loadedModel;
+//     computeEmbeddings(tags).then((embeddings) => {
+//         tagEmbeddings = embeddings;
+//         console.log('Tag embeddings computed');
+//     });
+// });
 
 async function computeEmbeddings(sentences) {
     const embeddings = await model.embed(sentences);
@@ -543,26 +541,112 @@ function cosineSimilarity(A, B) {
     return dotProduct / (magnitudeA * magnitudeB);
 }
 
-const upload = multer({ dest: 'uploads/' });
-app.post('/generate-webp-image', upload.single('image'), async (req, res) => {
-    try {
-      const inputPath = req.file.path;
-      const outputPath = `uploads/${req.file.filename}.webp`;
+
+// const storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, './uploads');  // Destination folder for uploaded images
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, `${Date.now()}-${file.originalname}`);  // Use timestamp and original name for uniqueness
+//     }
+//   });
   
-      // Convert the image to WebP
-      await sharp(inputPath)
-        .webp({ quality: 80 }) // Adjust quality (0-100)
-        .toFile(outputPath);
+//   // Multer configuration with file size limits and file type filtering
+//   export const upload = multer({
+//     storage: storage,
+//     limits: { fieldSize: 5 * 1024 * 1024 },  // Limit to 5MB file size
+//     fileFilter: (req, file, cb) => {
+//       const fileTypes = /jpg|jpeg|png|gif|svg/;  // Allowed file extensions
+//       const mimetype = fileTypes.test(file.mimetype);  // Check mime type
+//       const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());  // Check file extension
+//       if (mimetype && extname) {
+//         return cb(null, true);  // Accept the file
+//       }
+//       cb('Error: File upload only supports images (jpg, jpeg, png, gif, svg)');  // Reject invalid file types
+//     }
+// });
+
+// app.post('/generate-webp-image', upload.array('images'), async (req, res) => {
+//     try {
+//       // Array to store WebP image paths for response
+//       const webpImages = await Promise.all(
+//         req.files.map(async (file) => {
+//           const inputPath = file.path;
+//           const outputPath = `uploads/${file.filename}.webp`;
+  
+//           // Convert each image to WebP using sharp
+//           await sharp(inputPath)
+//             .webp({ quality: 80 })
+//             .toFile(outputPath);
+  
+//           // Return WebP image path
+//           return outputPath;
+//         })
+//       );
+  
+//       res.status(200).json({
+//         message: 'Images converted to WebP successfully',
+//         webpImagePaths: webpImages,
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       res.status(500).json({ error: 'Failed to convert images' });
+//     }
+// });
+
+const storage = multer.memoryStorage();
+
+const upload = multer({
+  storage: storage,
+  limits: { fieldSize: 5 * 1024 * 1024 },
+});
+
+app.post('/generate-webp-image', upload.array('images'), async (req, res) => {
+    try {
+      // Array to store WebP image paths for response
+      const webpImages = await Promise.all(
+        req.files.map(async (file) => {
+            const buffer = file.buffer; // Access image buffer
+  
+            // Generate unique filename with Date.now()
+            const uniqueFilename = `${Date.now()}-${file.originalname.split('.')[0]}.webp`;
+            const outputPath = path.join('uploads', uniqueFilename);
+    
+            // Convert the image to WebP using sharp in-memory processing
+            await sharp(buffer)
+                .webp({ quality: 80 })
+                .toFile(outputPath);
+
+
+            const uniqueFilenameAvif = `${Date.now()}-${file.originalname.split('.')[0]}.avif`;
+            const outputPathAvif = path.join('uploads', uniqueFilenameAvif);
+            await sharp(buffer)
+                .avif({ quality: 80 })
+                .toFile(outputPathAvif);
+
+            // const uniqueFilenamejpegxl = `${Date.now()}-${file.originalname.split('.')[0]}.jpegxl`;
+            // const outputPathjpegxl = path.join('uploads', uniqueFilenamejpegxl);
+
+            // await sharp(buffer)
+            //     .jpegxl({ quality: 80 })
+            //     .toFile(outputPathjpegxl);
+  
+            // Return the output path of the WebP image
+            return outputPath;
+        })
+      );
   
       res.status(200).json({
-        message: 'Image converted to WebP successfully',
-        webpImagePath: outputPath,
+        message: 'Images converted to WebP successfully',
+        webpImagePaths: webpImages, // This is the array of unique WebP file paths
       });
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: 'Failed to convert image' });
+      res.status(500).json({ error: 'Failed to convert images' });
     }
-  });
+});
+
+
 
 app.post('/tensorf-suggest-tags', async (req, res) => {
     const { selectedTags } = req.body;

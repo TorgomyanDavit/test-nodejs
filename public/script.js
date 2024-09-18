@@ -1,11 +1,36 @@
 const submit = document.getElementById("button")
 const div = document.querySelector(".innerDiv")
+const input = document.querySelector(".file-input")
 
-<<<<<<< HEAD
-submit.addEventListener("click",async () => {
-    const data = await fetch('http://localhost:8000/getNICMacandIPaddress')
-    console.log(data)
-})
+
+const setFormData = async (event) => {
+    const files = event.target.files;
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images', files[i]); 
+    }
+  
+    try {
+      const response = await fetch('http://localhost:8000/generate-webp-image', {
+        method: 'POST',
+        body: formData,
+      });
+  
+      const data = await response.json();
+      
+      console.log('Converted images:', data);
+  
+    } catch (error) {
+      console.error('Error uploading images:', error);
+    }
+};
+
+input.addEventListener("change", setFormData);
+
+// submit.addEventListener("click",async () => {
+//     const data = await fetch('http://localhost:8000/getNICMacandIPaddress')
+//     console.log(data)
+// })
 
 // submit.addEventListener("click",async () => {
 //     const data = await fetch('http://localhost:8000/createInterface')
@@ -14,17 +39,15 @@ submit.addEventListener("click",async () => {
 
 // submit.addEventListener("click",async () => {
 //     const data = await fetch('http://localhost:8000/insertTags')
-=======
 // submit.addEventListener("click",async () => {
 //     const data = await fetch('http://localhost:8000/createInterface')
->>>>>>> 922a46ecdee9192a4d8a143a83c057ac7faaa9f0
 //     console.log(data)
 // })
 
-submit.addEventListener("click",async () => {
-    const data = await fetch('http://localhost:5000/insertTags')
-    console.log(data)
-})
+// submit.addEventListener("click",async () => {
+//     const data = await fetch('http://localhost:5000/insertTags')
+//     console.log(data)
+// })
 
 // submit.addEventListener('click',async () => {
 //     const inputValue = document.getElementById('inputField').value
