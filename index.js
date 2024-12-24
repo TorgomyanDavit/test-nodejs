@@ -333,23 +333,23 @@ app.get('/insertTags', async (req, res) => {
 
     console.log(values.length)
 
-    // try {
-    //     const [result] = await pool.query(`INSERT INTO flowers.tags (tag_name, tag_type, image_url) VALUES ?`, [values]);
-    //     console.log('Data inserted successfully:', result);
-    //     res.send({ data: "Hello World" });
-    // } catch (err) {
-    //     console.error('Error inserting data:', err);
-    //     res.status(500).send({ error: 'Error inserting data' });
-    // }
-
     try {
-        const [result] = await pool.query('INSERT INTO flowers.tags_translation (tags_id, language_code, translated_tag_name) VALUES ?', [valuesTranslation]);
-        console.log('Translations inserted successfully:', result);
-        res.send({ data: "Translations inserted successfully" });
+        const [result] = await pool.query(`INSERT INTO flowers.tags (tag_name, tag_type, image_url) VALUES ?`, [values]);
+        console.log('Data inserted successfully:', result);
+        res.send({ data: "Hello World" });
     } catch (err) {
-        console.error('Error inserting translations:', err);
-        res.status(500).send({ error: 'Error inserting translations' });
+        console.error('Error inserting data:', err);
+        res.status(500).send({ error: 'Error inserting data' });
     }
+
+    // try {
+    //     const [result] = await pool.query('INSERT INTO flowers.tags_translation (tags_id, language_code, translated_tag_name) VALUES ?', [valuesTranslation]);
+    //     console.log('Translations inserted successfully:', result);
+    //     res.send({ data: "Translations inserted successfully" });
+    // } catch (err) {
+    //     console.error('Error inserting translations:', err);
+    //     res.status(500).send({ error: 'Error inserting translations' });
+    // }
 
     // res.status(500).send({ error: 'Error inserting translations' });
 });
@@ -618,11 +618,11 @@ app.post('/generate-webp-image', upload.array('images'), async (req, res) => {
                 .toFile(outputPath);
 
 
-            const uniqueFilenameAvif = `${Date.now()}-${file.originalname.split('.')[0]}.avif`;
-            const outputPathAvif = path.join('uploads', uniqueFilenameAvif);
-            await sharp(buffer)
-                .avif({ quality: 80 })
-                .toFile(outputPathAvif);
+            // const uniqueFilenameAvif = `${Date.now()}-${file.originalname.split('.')[0]}.avif`;
+            // const outputPathAvif = path.join('uploads', uniqueFilenameAvif);
+            // await sharp(buffer)
+            //     .avif({ quality: 80 })
+            //     .toFile(outputPathAvif);
 
             // const uniqueFilenamejpegxl = `${Date.now()}-${file.originalname.split('.')[0]}.jpegxl`;
             // const outputPathjpegxl = path.join('uploads', uniqueFilenamejpegxl);

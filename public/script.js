@@ -6,6 +6,7 @@ const input = document.querySelector(".file-input")
 const setFormData = async (event) => {
     const files = event.target.files;
     const formData = new FormData();
+    debugger
     for (let i = 0; i < files.length; i++) {
       formData.append('images', files[i]); 
     }
@@ -44,10 +45,10 @@ input.addEventListener("change", setFormData);
 //     console.log(data)
 // })
 
-// submit.addEventListener("click",async () => {
-//     const data = await fetch('http://localhost:5000/insertTags')
-//     console.log(data)
-// })
+submit.addEventListener("click",async () => {
+    const data = await fetch('http://localhost:5000/insertTags')
+    console.log(data)
+})
 
 // submit.addEventListener('click',async () => {
 //     const inputValue = document.getElementById('inputField').value
