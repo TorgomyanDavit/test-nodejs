@@ -1,32 +1,84 @@
 const submit = document.getElementById("button")
+const saveExcellFile = document.getElementById("upload")
 const div = document.querySelector(".innerDiv")
 const input = document.querySelector(".file-input")
 
 
 const setFormData = async (event) => {
-    const files = event.target.files;
-    const formData = new FormData();
-    debugger
-    for (let i = 0; i < files.length; i++) {
-      formData.append('images', files[i]); 
-    }
-  
-    try {
-      const response = await fetch('http://localhost:8000/generate-webp-image', {
-        method: 'POST',
-        body: formData,
-      });
-  
-      const data = await response.json();
-      
-      console.log('Converted images:', data);
-  
-    } catch (error) {
-      console.error('Error uploading images:', error);
-    }
+  event.preventDefault();
+  try {
+        //   const response = await fetch("http://127.0.0.1:8000/api/GetExcelNew", {
+        const response = await fetch("https://stockapi.yerevan-city.am/api/GetExcelNew", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ date: {
+                date_from:"2025-03-05",
+                date_to:"2025-03-06"
+            } 
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error fetching CSV file:", errorText);
+            return;
+        }
+
+
+        // const responseJson = await response.json();
+        // console.log(responseJson,"responseJson")
+
+        // Create a temporary URL for the file
+        const blob = await response.blob();
+
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ProductsReport.csv";
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        a.remove();
+  } catch (error) {
+      console.error("Error:", error);
+  }
 };
 
-input.addEventListener("change", setFormData);
+saveExcellFile.addEventListener("click", setFormData);
+
+// submit.addEventListener("click",async () => {
+//     const data = await fetch('https://stockapi.yerevan-city.am/api/GetExcel').then((res) => res.json())
+//     console.log(data)
+// })
+
+// const setFormData = async (event) => {
+//     const files = event.target.files;
+//     const formData = new FormData();
+//     debugger
+//     for (let i = 0; i < files.length; i++) {
+//       formData.append('images', files[i]); 
+//     }
+  
+//     try {
+//       const response = await fetch('http://localhost:8000/generate-webp-image', {
+//         method: 'POST',
+//         body: formData,
+//       });
+  
+//       const data = await response.json();
+      
+//       console.log('Converted images:', data);
+  
+//     } catch (error) {
+//       console.error('Error uploading images:', error);
+//     }
+// };
+
+// input.addEventListener("change", setFormData);
 
 // submit.addEventListener("click",async () => {
 //     const data = await fetch('http://localhost:8000/getNICMacandIPaddress')
