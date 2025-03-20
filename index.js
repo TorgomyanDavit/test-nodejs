@@ -34,7 +34,7 @@ import * as use from '@tensorflow-models/universal-sentence-encoder';
 import readline from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
 import multer from 'multer';
-
+import puppeteer from 'puppeteer';  
 
 
 
@@ -1309,6 +1309,85 @@ app.get('/langiageChangetoRuEnAm', (req, res) => {
     }
 
     res.send({name:'xss'});
+});
+
+app.get('/customPageClick', (req, res) => {
+    (async () => {
+        const browser = await puppeteer.launch({ headless: false });  
+        const page = await browser.newPage();  
+        
+        // Wait for the page to fully load
+        // await page.goto('https://www.surberrordutyun.com/', { waitUntil: 'domcontentloaded' });
+        await page.goto('https://it.tlscontact.com/am/evn/login.php', { waitUntil: 'domcontentloaded' });
+        await page.setViewport({ width: 1920, height: 1080 });
+        // const pageTitle = await page.title();
+
+        const emailInputSelector = '#email';  
+        await page.waitForSelector(emailInputSelector, { timeout: 5000 }); 
+        await page.waitForTimeout(3000);
+        await page.type(emailInputSelector, 'centralexpert3@gmail.com');  
+        await page.waitForTimeout(1000);
+    
+        const pwdInputSelector = '#pwd';  
+        await page.waitForSelector(pwdInputSelector, { timeout: 5000 }); 
+        await page.waitForTimeout(3000);
+        await page.type(pwdInputSelector, 'Italia123#');  
+        await page.waitForTimeout(1000);
+
+
+        const clickButton = async () => {
+            try {
+                const submitSelector = '#login_button';  
+                await page.waitForSelector(submitSelector, { timeout: 5000 }); 
+                await page.waitForTimeout(3000);
+                await page.click(submitSelector);  
+                console.log('Button clicked!');
+            } catch (error) {
+                console.error('Error clicking the button:', error);
+            }
+        };
+        await clickButton();
+
+        const clickTimeButton = async () => {
+            try {
+                await page.waitForTimeout(4000);
+
+                const timerSubmitSelector = '.appt-table-btn';  
+                await page.waitForSelector(timerSubmitSelector, { timeout: 5000 }); 
+                await page.waitForTimeout(1000);
+
+                const buttons = await page.$$(timerSubmitSelector); // Select all buttons
+                await page.waitForTimeout(1000);
+
+                if (buttons.length >= 3) {
+                    await buttons[0].click();
+                    await page.waitForTimeout(2000); // Small delay
+                    await buttons[1].click();
+                    await page.waitForTimeout(2000); // Small delay
+                    await buttons[2].click();
+                    console.log('Clicked three appointment buttons!');
+                } else {
+                    console.log('Not enough buttons found!');
+                }
+            } catch (error) {
+                console.error('Error clicking the button:', error);
+            }
+        };
+        await clickTimeButton();
+        
+
+        // setInterval(async () => {
+        //     await clickButton();
+        // }, 10000);  // 10000 ms = 10 seconds
+    
+        // Wait for navigation (if it redirects)
+        // await page.waitForNavigation({ waitUntil: 'networkidle2' });
+        // await page.waitForTimeout(60000);  
+        // Close the browser
+        // await browser.close();
+    })();
+      
+    res.send({data:"Hello World"});
 });
 
 /** Event Loop bug */

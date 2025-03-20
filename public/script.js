@@ -4,56 +4,110 @@ const div = document.querySelector(".innerDiv")
 const input = document.querySelector(".file-input")
 
 
-const setFormData = async (event) => {
-  event.preventDefault();
-  try {
-        //   const response = await fetch("http://127.0.0.1:8000/api/GetExcelNew", {
-        const response = await fetch("https://stockapi.yerevan-city.am/api/GetExcelNew", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ date: {
-                date_from:"2025-03-05",
-                date_to:"2025-03-06"
-            } 
-            }),
-        });
+submit.addEventListener("click", async () => {
+    const data = await fetch('http://127.0.0.1:8000/customPageClick').then((res) => res.json())
+    console.log(data);
+})
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Error fetching CSV file:", errorText);
-            return;
-        }
+submit.addEventListener("click", sendProductReport);
 
 
-        // const responseJson = await response.json();
-        // console.log(responseJson,"responseJson")
+// const sendProductReport = async (event) => {
+//   event.preventDefault();
+//   try {
+//         const response = await fetch("http://127.0.0.1:8000/api/ProductReport/add", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({
+//                 sap_code: "111113",
+//                 sap_code_name: "Թեստտտտտտտ",
+//                 category_sap_code: 5050203,
+//                 category_sap_code_name: "Թեստտտտտտտտտտ",
+//                 main_reason: 1, // collectorProduct.Comment === "Մնացորդ" ? 1 : collectorProduct.Comment === "Ժամկետ" ? 3 : 2,
+//                 user_basket_count: 1000 , // product.IsKilogram ? orderDetails.Weight : orderDetails.Quantity,
+//                 stock_count: 14318, // product.IsKilogram ? collectorProduct.StockWeight : collectorProduct.StockCount,
+//                 unit_price: 1390, // orderDetails.UnitPrice,
+//                 branch: "PR10", // branch,
+//                 date: "12/2/2024 6:59:25 AM", // collectorProduct.CreatedDt.toISOString(),
+//                 image: "https://media.yerevan-city.am/api/Image/Resize/ProductPhoto/ei_17331230437433329861675416794749-638687342777016072.jpg/400/400/false",
+//                 is_kilogram: 1, // product.IsKilogram,
+//                 order_id: 1819484, // order.Id
+//             }),
+//         });
 
-        // Create a temporary URL for the file
-        const blob = await response.blob();
+//         if (!response.ok) {
+//             const errorText = await response.text();
+//             console.error("Error fetching CSV file:", errorText);
+//             return;
+//         }
 
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "ProductsReport.csv";
-        document.body.appendChild(a);
-        a.click();
 
-        // Cleanup
-        window.URL.revokeObjectURL(url);
-        a.remove();
-  } catch (error) {
-      console.error("Error:", error);
-  }
-};
+//         const responseJson = await response.json();
+//         console.log(responseJson,"responseJson")
+//         debugger
 
-saveExcellFile.addEventListener("click", setFormData);
 
-// submit.addEventListener("click",async () => {
-//     const data = await fetch('https://stockapi.yerevan-city.am/api/GetExcel').then((res) => res.json())
-//     console.log(data)
+//   } catch (error) {
+//       console.error("Error:", error);
+//   }
+// };
+
+// submit.addEventListener("click", sendProductReport);
+
+// submit.addEventListener("click", async () => {
+//     const data = await fetch('http://127.0.0.1:8000/api/GetExcelNew/2707').then((res) => res.json())
+//     console.log(data);
 // })
+
+// const saveExcellFileHandler = async (event) => { 
+//   event.preventDefault();
+//   try {
+//         //   const response = await fetch("http://127.0.0.1:8000/api/GetExcelNew", {
+//         const response = await fetch("https://stockapi.yerevan-city.am/api/deletedItems", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({
+//                 date_from:"2025-03-05T11:50:46.974Z",
+//                 date_to:"2025-03-06T11:50:46.974Z"
+//             }),
+//         });
+
+//         if (!response.ok) {
+//             const errorText = await response.text();
+//             console.error("Error fetching CSV file:", errorText);
+//             return;
+//         }
+
+
+//         const responseJson = await response.json();
+//         // console.log(responseJson,"responseJson")
+
+//         debugger
+//         // Create a temporary URL for the file
+//         // const blob = await response.blob();
+
+//         // const url = window.URL.createObjectURL(blob);
+//         // const a = document.createElement("a");
+//         // a.href = url;
+//         // a.download = "ProductsReport.csv";
+//         // document.body.appendChild(a);
+//         // a.click();
+
+//         // Cleanup
+//         window.URL.revokeObjectURL(url);
+//         a.remove();
+//   } catch (error) {
+//       console.error("Error:", error);
+//   }
+// };
+
+// saveExcellFile.addEventListener("click", saveExcellFileHandler);
+
+
 
 // const setFormData = async (event) => {
 //     const files = event.target.files;
@@ -97,10 +151,10 @@ saveExcellFile.addEventListener("click", setFormData);
 //     console.log(data)
 // })
 
-submit.addEventListener("click",async () => {
-    const data = await fetch('http://localhost:5000/insertTags')
-    console.log(data)
-})
+// submit.addEventListener("click",async () => {
+//     const data = await fetch('http://localhost:5000/insertTags')
+//     console.log(data)
+// })
 
 // submit.addEventListener('click',async () => {
 //     const inputValue = document.getElementById('inputField').value
