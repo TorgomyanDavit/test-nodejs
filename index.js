@@ -1318,22 +1318,26 @@ app.get('/customPageClick', (req, res) => {
         
         // Wait for the page to fully load
         // await page.goto('https://www.surberrordutyun.com/', { waitUntil: 'domcontentloaded' });
-        await page.goto('https://it.tlscontact.com/am/evn/login.php', { waitUntil: 'domcontentloaded' });
+
+        const openUrlLogin = 'https://it.tlscontact.com/am/evn/login.php'
+        const openUrlPage = 'https://it.tlscontact.com/am/evn/myapp.php?fg_id=1673825'
+
+        await page.goto(openUrlLogin, { waitUntil: 'domcontentloaded' });
         await page.setViewport({ width: 1920, height: 1080 });
         // const pageTitle = await page.title();
 
         const emailInputSelector = '#email';  
         await page.waitForSelector(emailInputSelector, { timeout: 5000 }); 
         await page.waitForTimeout(3000);
-        await page.type(emailInputSelector, 'centralexpert3@gmail.com');  
+        await page.type(emailInputSelector, 'hajoxakani@gmail.com');  
         await page.waitForTimeout(1000);
     
+
         const pwdInputSelector = '#pwd';  
         await page.waitForSelector(pwdInputSelector, { timeout: 5000 }); 
         await page.waitForTimeout(3000);
         await page.type(pwdInputSelector, 'Italia123#');  
         await page.waitForTimeout(1000);
-
 
         const clickButton = async () => {
             try {
@@ -1348,31 +1352,67 @@ app.get('/customPageClick', (req, res) => {
         };
         await clickButton();
 
+        await page.waitForNavigation({ waitUntil: 'networkidle2' });
+
+
+        let count = 0;
+        const maxCount = 2000;
+
         const clickTimeButton = async () => {
             try {
-                await page.waitForTimeout(4000);
+                while (count < maxCount) {  
+                    await page.waitForTimeout(2000);
+        
+                    // const timerSubmitSelector = '.appt-table-btn';  
+                    // await page.waitForSelector(timerSubmitSelector, { timeout: 5000 }); 
+                    // await page.waitForTimeout(1000);
+        
+                    // const buttons = await page.$$(timerSubmitSelector); // Select all buttons
+                    // await page.waitForTimeout(1000);
+        
+                    // if (buttons.length >= 3) {
+                    //     await buttons[0].click();
+                    //     await page.waitForTimeout(2000); // Small delay
+                    //     await buttons[1].click();
+                    //     await page.waitForTimeout(2000); // Small delay
+                    //     await buttons[2].click();
+                    //     console.log('Clicked three appointment buttons!');
+                    // } else {
+                    //     console.log('Not enough buttons found!');
+                    // }
+        
+                    const url = page.url();  
+        
+                    // Check if URL matches the pattern
+                    if (/^https:\/\/it\.tlscontact\.com\/am\/evn\/myapp\.php\?fg_id=\d+$/.test(url)) {
+                        console.log(`✅ Still on the correct page: ${url}`);
+            
+                        // Wait 5 seconds before reloading
 
-                const timerSubmitSelector = '.appt-table-btn';  
-                await page.waitForSelector(timerSubmitSelector, { timeout: 5000 }); 
-                await page.waitForTimeout(1000);
+                        const randomDelay = () => Math.floor(Math.random() * (12000 - 5000 + 1)) + 5000; // Random delay between 5s and 12s
 
-                const buttons = await page.$$(timerSubmitSelector); // Select all buttons
-                await page.waitForTimeout(1000);
-
-                if (buttons.length >= 3) {
-                    await buttons[0].click();
-                    await page.waitForTimeout(2000); // Small delay
-                    await buttons[1].click();
-                    await page.waitForTimeout(2000); // Small delay
-                    await buttons[2].click();
-                    console.log('Clicked three appointment buttons!');
-                } else {
-                    console.log('Not enough buttons found!');
+                        await page.waitForTimeout(randomDelay()); 
+                        await page.reload({ waitUntil: 'domcontentloaded' });
+            
+                        console.log('🔄 Page reloaded! Repeating process...');
+                    } 
+                    
+                    // else {
+                    //     console.log(`❌ Wrong page detected (${url}), closing browser...`);
+                    //     await page.close();
+                    //     break;
+                    // }
+            
+                    count++;
+            
+                    console.log(`⏳ Waiting 10 seconds...`);
+                    await page.waitForTimeout(10000);
                 }
             } catch (error) {
                 console.error('Error clicking the button:', error);
             }
         };
+        
         await clickTimeButton();
         
 
