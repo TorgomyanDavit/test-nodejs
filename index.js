@@ -601,6 +601,7 @@ const upload = multer({
   limits: { fieldSize: 5 * 1024 * 1024 },
 });
 
+
 app.post('/generate-webp-image', upload.array('images'), async (req, res) => {
     try {
       // Array to store WebP image paths for response
@@ -645,8 +646,6 @@ app.post('/generate-webp-image', upload.array('images'), async (req, res) => {
       res.status(500).json({ error: 'Failed to convert images' });
     }
 });
-
-
 
 app.post('/tensorf-suggest-tags', async (req, res) => {
     const { selectedTags } = req.body;
@@ -1430,6 +1429,90 @@ app.get('/customPageClick', (req, res) => {
     res.send({data:"Hello World"});
 });
 
+app.get('/generete-webp-from-folder', async (req, res) => {
+    const inputFolder = path.join(__dirname, '..', 'public', 'images', 'category');
+    const outputFolder = path.join(__dirname, '..', 'public', 'images', 'category_webp');
+  
+    try {
+      const message = await convertImagesToWebp(inputFolder, outputFolder);
+      res.send(message);
+    } catch {
+      res.status(500).send('Error converting images');
+    }
+      
+    res.send({data:"Hello World"});
+});
+
+
+export const convertImagesToWebp = async (inputPath, outputPath) => {
+    try {
+      // Ensure the output folder exists
+      await fs.mkdir(outputPath, { recursive: true });
+  
+      // Read all files from the input folder
+      const files = await fs.readdir(inputPath);
+  
+      // Filter image files (.jpg, .jpeg, .png)
+      const imageFiles = files.filter(file =>
+        ['.jpg', '.jpeg', '.png'].includes(path.extname(file).toLowerCase())
+      );
+  
+      for (const file of imageFiles) {
+        const inputFilePath = path.join(inputPath, file);
+        const outputFileName = path.parse(file).name + '.webp';
+        const outputFilePath = path.join(outputPath, outputFileName);
+  
+        const buffer = await fs.readFile(inputFilePath);
+  
+        await sharp(buffer)
+          .webp({ quality: 80 })
+          .toFile(outputFilePath);
+  
+        console.log(`Converted: ${file} → ${outputFileName}`);
+      }
+  
+      return `✅ Converted ${imageFiles.length} images to WebP in "${outputPath}"`;
+    } catch (err) {
+      console.error('❌ Conversion failed:', err);
+      throw new Error('Image conversion error');
+    }
+};
+
+
+const getFolderLengths = async () => {
+    const folder1 = path.join(__dirname, '..', 'public', 'images', 'category');
+    const folder2 = path.join(__dirname, '..', 'public', 'images', 'category_webp');
+  
+    try {
+      const files1 = await fs.readdir(folder1);
+      const files2 = await fs.readdir(folder2);
+  
+      // Optional: only count images
+      const imageExtensions = ['.jpg', '.jpeg', '.png'];
+      const webpExtension = ['.webp'];
+  
+      const imageFiles1 = files1.filter(file =>
+        imageExtensions.includes(path.extname(file).toLowerCase())
+      );
+  
+      const imageFiles2 = files2.filter(file =>
+        webpExtension.includes(path.extname(file).toLowerCase())
+      );
+  
+      console.log(`Folder 1 (Original): ${imageFiles1.length} image(s)`);
+      console.log(`Folder 2 (WebP): ${imageFiles2.length} image(s)`);
+  
+      if (imageFiles1.length === imageFiles2.length) {
+        console.log('✅ All images successfully converted!');
+      } else {
+        console.log('⚠️ Not all images were converted.');
+      }
+    } catch (err) {
+      console.error('Error comparing folders:', err);
+    }
+  };
+  
+  getFolderLengths();
 /** Event Loop bug */
 // process.nextTick(() => {
 //     process.nextTick(() => console.log('nextTick 1')); // առաջինը տպումա console.log(`nextTick`);
@@ -1437,7 +1520,34 @@ app.get('/customPageClick', (req, res) => {
 // });
 // process.nextTick(() => console.log('nextTick 1')); 
 // Promise.resolve().then(() => console.log(`Promise 1`)); // առաջինը տպումա console.log(`Promise`);
+// const url = `https://abio.am:8443/abio/public/filter?catalogId=101&sortingMethod=&color=&minPrice=&maxPrice=&page=0&size=120&language=am`;
 
+// async function fetchAndWriteNames() {
+//   try {
+//     const res = await fetch(url);
+//     if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+    
+//     const content = await res.json();
+//     const items = content || [];
+
+//     // Extract names
+//     const names = items
+//     .map(item => item.name)
+//     .filter(name => typeof name === 'string' && name.trim() !== '') // Only non-empty strings
+//     .map(name => name.replace(/\s?\d+(\.\d+)?/g, '').trim()); // Remove numbers and extra spaces
+
+
+
+
+//     console.log('✅ Names written to:', names.slice(-20)); // Log the first 10 names
+
+
+//   } catch (err) {
+//     console.error('❌ Error:', err.message);
+//   }
+// }
+
+// fetchAndWriteNames();
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on http://localhost:${process.env.PORT}`);
